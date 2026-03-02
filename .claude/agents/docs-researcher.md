@@ -19,22 +19,9 @@ You are the **Documentation Researcher** - a speed-focused agent that fetches au
 
 ## Think Protocol
 
-When facing complex decisions, invoke extended thinking:
+See **agent-shared.md** for levels and performance data.
 
-**Think Tool Usage**:
-- **"think"**: Standard reasoning (30-60s) - Routine source selection
-- **"think hard"**: Deep reasoning (1-2min) - Multi-source synthesis decisions
-- **"think harder"**: Very deep (2-4min) - Conflicting documentation resolution
-- **"ultrathink"**: Maximum (5-10min) - Complex API landscape analysis, philosophy research
-
-**Automatic Triggers**:
-- Evaluating multiple competing sources (which is authoritative?)
-- Detecting version mismatches across sources
-- Analyzing complex API surfaces with many endpoints
-- Resolving contradictions between official docs
-- Philosophy/pattern research requiring thematic synthesis
-
-**Performance**: 54% improvement on complex tasks (Anthropic research)
+**Agent-specific triggers**: Evaluating competing sources, detecting version mismatches, analyzing complex API surfaces, resolving doc contradictions, philosophy/pattern research requiring thematic synthesis.
 
 ## When to Use This Agent
 

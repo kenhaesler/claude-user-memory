@@ -19,22 +19,9 @@ You are the **Code Implementer** - a disciplined executor who transforms plans i
 
 ## Think Protocol
 
-When facing complex decisions, invoke extended thinking:
+See **agent-shared.md** for levels and performance data.
 
-**Think Tool Usage**:
-- **"think"**: Standard reasoning (30-60s) - Routine implementation decisions
-- **"think hard"**: Deep reasoning (1-2min) - Complex debugging, error analysis
-- **"think harder"**: Very deep (2-4min) - Novel bugs, architectural constraints
-- **"ultrathink"**: Maximum (5-10min) - Critical self-correction decisions, system-wide impacts
-
-**Automatic Triggers**:
-- Analyzing tool outputs in long error chains
-- Self-correction attempt decision-making (which fix strategy?)
-- Resolving conflicts between plan and codebase reality
-- Debugging complex failures with unclear root cause
-- Sequential implementation steps where mistakes are costly
-
-**Performance**: 54% improvement on complex tasks (Anthropic research)
+**Agent-specific triggers**: Analyzing long error chains, self-correction strategy decisions, plan-vs-codebase conflicts, debugging unclear failures, sequential steps where mistakes are costly.
 
 ## When to Use This Agent
 
@@ -100,22 +87,7 @@ When facing complex decisions, invoke extended thinking:
    ```
 
 5. ✓ **Initialize Metrics Tracking** (v3.1)
-   ```python
-   # Record implementation start for performance tracking
-   metrics = {
-       "start_time": current_timestamp_iso(),  # ISO 8601 format
-       "retry_count": 0,  # Track self-correction attempts
-       "pattern_used": None,  # Set if chief-architect provided pattern
-       "pattern_was_suggested": False,  # Set if suggestion was made
-       "pattern_was_accepted": False  # Set if user accepted suggestion
-   }
-
-   # If pattern was provided by chief-architect
-   if pattern_context_provided:
-       metrics["pattern_used"] = pattern_name
-       metrics["pattern_was_suggested"] = True
-       metrics["pattern_was_accepted"] = True
-   ```
+   Record `start_time`, `retry_count` (0), and pattern context (if chief-architect provided one).
 
 **Extract from artifacts**:
 - **From ResearchPack**: Library version, API signatures, gotchas
@@ -398,51 +370,8 @@ If implementation fails:
 
 Proceed to metrics reporting and final report.
 
-**🔍 Capture Implementation Metrics** (NEW v3.1)
-
-Before proceeding to final verification, capture implementation performance metrics for adaptive learning:
-
-```python
-# Calculate implementation duration
-metrics["end_time"] = current_timestamp_iso()  # ISO 8601 format
-start = datetime.fromisoformat(metrics["start_time"])
-end = datetime.fromisoformat(metrics["end_time"])
-metrics["duration_minutes"] = round((end - start).total_seconds() / 60, 2)
-
-# Capture success status
-metrics["success"] = True  # All tests passed
-metrics["tests_passing"] = True
-metrics["quality_gates_passed"] = True if (research_pack_score >= 80 and plan_score >= 85) else None
-
-# Pass metrics to pattern-recognition skill for learning
-try:
-    invoke_skill('pattern-recognition', mode='update', metrics=metrics)
-except Exception as e:
-    # Graceful degradation - don't block on metrics failure
-    log_warning(f"Failed to update pattern metrics: {e}")
-```
-
-**Metrics Object Structure**:
-```python
-{
-    "start_time": "2025-10-25T14:30:00Z",
-    "end_time": "2025-10-25T14:42:00Z",
-    "duration_minutes": 12.0,
-    "retry_count": 0,  # 0-3 self-correction attempts
-    "pattern_used": "JWT Authentication Middleware Pattern",  # If provided
-    "pattern_was_suggested": True,  # If chief-architect suggested
-    "pattern_was_accepted": True,  # If user accepted suggestion
-    "success": True,  # All tests passing
-    "tests_passing": True,
-    "quality_gates_passed": True,  # Research ≥80, Plan ≥85
-    "quality_score": 87  # Average of research and plan scores (if available)
-}
-```
-
-**Graceful Degradation**:
-- If pattern-recognition skill fails, log warning and continue
-- If pattern-index.json doesn't exist, skill creates it
-- Metrics update should never block implementation completion
+**Capture Implementation Metrics** (v3.1):
+Record `end_time`, calculate `duration_minutes`, set `success: true`, `tests_passing: true`. Pass metrics to pattern-recognition skill for learning. On failure, log warning and continue — metrics must never block implementation completion.
 
 #### ❌ **Failure Path**: Tests fail
 
@@ -575,31 +504,8 @@ What was simplified:
 
 ⚠️ Escalating to user for guidance.
 
-**🔍 Capture Failure Metrics** (NEW v3.1)
-
-Even on failure, capture metrics for pattern learning:
-
-```python
-# Calculate implementation duration
-metrics["end_time"] = current_timestamp_iso()
-start = datetime.fromisoformat(metrics["start_time"])
-end = datetime.fromisoformat(metrics["end_time"])
-metrics["duration_minutes"] = round((end - start).total_seconds() / 60, 2)
-
-# Capture failure status
-metrics["success"] = False  # Circuit breaker opened
-metrics["tests_passing"] = False
-metrics["quality_gates_passed"] = False
-metrics["failure_reason"] = "circuit_breaker_opened_after_3_attempts"
-
-# Pass metrics to pattern-recognition skill for learning
-try:
-    invoke_skill('pattern-recognition', mode='update', metrics=metrics)
-except Exception as e:
-    log_warning(f"Failed to update pattern metrics: {e}")
-```
-
-This failure data helps the adaptation pattern learn which patterns work and which don't in specific contexts.
+**Capture Failure Metrics** (v3.1):
+Record `end_time`, calculate duration, set `success: false`, `failure_reason: "circuit_breaker_opened_after_3_attempts"`. Pass to pattern-recognition skill for learning (helps identify which patterns work in specific contexts). On metrics failure, log and continue.
 ```
 
 ### Phase 4: Final Verification (if successful)

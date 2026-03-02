@@ -1441,8 +1441,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 **Research Finding**: 90.2% performance improvement on complex tasks using parallel multi-agent architecture
 
 **Architecture Pattern**:
-- **Lead Orchestrator**: Claude Opus 4 (plans and coordinates)
-- **Parallel Workers**: Claude Sonnet 4 (execute specialized tasks)
+- **Lead Orchestrator**: Claude Opus 4.6 (plans and coordinates)
+- **Parallel Workers**: Claude Sonnet 4.6 (execute specialized tasks)
 - **Swarm Pattern**: Direct agent-to-agent communication (flat token usage)
 - **Supervisor Pattern**: Central coordinator (higher overhead, use only when necessary)
 

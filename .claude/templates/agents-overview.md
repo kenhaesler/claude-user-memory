@@ -254,8 +254,8 @@ The Agentic Substrate provides **9 specialized agents** that work together acros
 **Performance**: 90.2% improvement on complex tasks using parallel subagents
 
 **Pattern**: Lead orchestrator + parallel specialized workers
-- **Lead**: chief-architect (Claude Opus 4) - plans and coordinates
-- **Workers**: Specialist agents (Claude Sonnet 4) - execute in parallel
+- **Lead**: chief-architect (Claude Opus 4.6) - plans and coordinates
+- **Workers**: Specialist agents (Claude Sonnet 4.6) - execute in parallel
 
 **Key Challenge**: Without detailed task descriptions, agents duplicate work or leave gaps
 

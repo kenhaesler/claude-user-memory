@@ -22,15 +22,10 @@ Every deployment must be safe, reversible, and validated. Use canary releases as
 
 ## Anthropic Enhancements
 
+> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+
 ### Think Protocol for Deployment Decisions
-<think>
-Before any deployment:
-- What's the risk level of this change? (code, config, infra)
-- What's the rollback strategy? (time to rollback <5min?)
-- What could go wrong? (error scenarios)
-- What metrics validate success? (error rate, latency, business)
-- Is staging fully validated? (all tests passed?)
-</think>
+**Pre-deployment analysis**: Assess risk level, verify rollback strategy (<5min), enumerate failure scenarios, define validation metrics, confirm staging.
 
 ### Safety-First Patterns (Anthropic Standard)
 1. **Canary by Default**: All production deployments start at 5% traffic
@@ -48,16 +43,7 @@ Before any deployment:
 ## Deployment Protocol
 
 ### Phase 1: Pre-Deployment Validation
-<think>
-Pre-flight checklist:
-- CI/CD status: All tests passing?
-- Staging: Fully validated?
-- Dependencies: Compatible versions?
-- Infrastructure: Capacity sufficient?
-- Rollback plan: Documented and tested?
-- Team: On-call engineer aware?
-- Monitoring: Dashboards ready?
-</think>
+**Pre-flight checklist**: Verify CI/CD passing, staging validated, dependency compatibility, infrastructure capacity, rollback plan documented, on-call engineer aware, monitoring dashboards ready.
 
 ```yaml
 pre_deployment_checks:
@@ -91,16 +77,7 @@ pre_deployment_checks:
 6. Verify rollback procedure
 
 ### Phase 3: Deployment Execution (Canary Strategy - Default)
-<think>
-Canary rollout strategy:
-- Why 5% → 25% → 50% → 100%?
-  - 5%: Detect issues with minimal blast radius
-  - 25%: Validate under real load
-  - 50%: Confirm stability
-  - 100%: Full rollout if all healthy
-- Observation windows prevent rushing
-- Auto-rollback triggers catch issues fast
-</think>
+**Canary rationale**: 5% (minimal blast radius) -> 25% (real load validation) -> 50% (stability confirmation) -> 100% (full rollout). Observation windows prevent rushing; auto-rollback triggers catch issues fast.
 
 ```bash
 # Canary Deployment (Default Production Strategy)
@@ -146,14 +123,7 @@ fi
 ```
 
 ### Phase 4: Post-Deployment Validation
-<think>
-Validation checklist:
-- Application health: All pods healthy?
-- Error rates: Within normal bounds (<0.1%)?
-- Performance: Latency within SLA?
-- Business metrics: Conversions stable/improved?
-- User feedback: Any complaints?
-</think>
+**Validation checklist**: Confirm all pods healthy, error rates <0.1%, latency within SLA, business metrics stable/improved, no user complaints.
 
 1. Verify application health (100% healthy pods)
 2. Check error rates (<0.1% target)
@@ -164,12 +134,7 @@ Validation checklist:
 7. Update runbooks with learnings
 
 ### Phase 5: Automatic Rollback Protocol
-<think>
-When to rollback:
-- Automatic: Metrics breach thresholds
-- Manual: On-call engineer decision
-- How fast: <5 minutes to previous state
-</think>
+**Rollback triggers**: Automatic on metrics threshold breach, manual by on-call decision. Target: <5 minutes to previous state.
 
 ```bash
 # Automatic Rollback Triggers
@@ -252,15 +217,8 @@ canary_config:
 
 ```bash
 # Blue-Green Deployment
-<think>
-Blue-Green use cases:
-- Major version upgrades (v1 → v2)
-- Breaking API changes
-- Database migrations
-- Framework upgrades
-
-Tradeoff: 2x resources for 24h vs instant rollback
-</think>
+# Use cases: major version upgrades, breaking API changes, DB migrations, framework upgrades.
+# Tradeoff: 2x resources for 24h vs instant rollback.
 
 # Deploy to green environment (new version)
 deploy_to_environment "green" "v2.0.0"
@@ -301,13 +259,7 @@ kubectl rollout undo deployment/app
 
 ### Terraform (AWS/GCP/Azure)
 ```bash
-<think>
-IaC best practices:
-- Always plan before apply
-- Review changes carefully
-- Backup state before changes
-- Use workspaces for environments
-</think>
+# IaC best practices: Always plan before apply, review changes carefully, backup state, use workspaces per environment.
 
 # Plan infrastructure changes
 terraform plan -out=deployment.tfplan
@@ -340,14 +292,7 @@ kubectl get events --sort-by='.lastTimestamp'
 ## Feature Flag Management (Progressive Rollout)
 
 ### Gradual Feature Enablement
-<think>
-Feature flags enable:
-- Deploy without exposing
-- Test in production safely
-- Gradual user exposure
-- Instant disable if issues
-- A/B testing capability
-</think>
+**Feature flag benefits**: Deploy without exposing, test in production safely, gradual user exposure, instant disable on issues, A/B testing.
 
 ```python
 # Deployment: Feature deployed but disabled

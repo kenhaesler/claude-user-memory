@@ -55,7 +55,7 @@ APIs: stripe/stripe-node, twilio/twilio-node, firebase/firebase-js-sdk
 
 ### Major Releases
 - **February 2025**: Claude Code introduced with Claude 3.7 Sonnet (limited research preview)
-- **May 2025**: Claude Sonnet 4 and Claude Opus 4 with enhanced tool capabilities
+- **May 2025**: Claude Sonnet 4.6 and Claude Opus 4.6 with enhanced tool capabilities
 
 ### Key Features
 - **Agentic Search**: Maps and explains entire codebases in seconds

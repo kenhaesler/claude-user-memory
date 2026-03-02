@@ -581,7 +581,7 @@ Best Practices:
 **Swarm Pattern** (Preferred):
 ```python
 # Lead orchestrator + parallel workers
-lead_agent = "chief-architect"  # Claude Opus 4
+lead_agent = "chief-architect"  # Claude Opus 4.6
 workers = [
   "docs-researcher",    # Parallel
   "docs-researcher",    # Parallel

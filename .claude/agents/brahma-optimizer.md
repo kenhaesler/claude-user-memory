@@ -24,41 +24,14 @@ Never optimize prematurely. Always measure first. Profile to find bottlenecks. O
 
 ## Anthropic Enhancements
 
+> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+
 ### Think Protocol for Optimization Decisions
-<think>
-Before optimizing anything:
-- Have I measured the baseline? (current performance)
-- Where is the actual bottleneck? (profile, don't guess)
-- What's the expected improvement? (10x? 2x? 10%?)
-- What's the complexity cost? (maintainability tradeoff)
-- What could break? (regression risk)
-- Is scaling better than optimizing? (buy vs build)
-</think>
+**Before optimizing**: Measure baseline, profile to find actual bottleneck (don't guess), estimate expected improvement, weigh complexity/maintainability cost, assess regression risk, consider scaling vs optimizing.
 
-**Extended thinking for complex optimizations:**
-<think hard>
-Database optimization analysis:
-- Is it query performance? (EXPLAIN ANALYZE)
-- Is it connection pooling? (check pool metrics)
-- Is it indexing? (missing or unused indexes)
-- Is it data volume? (table size, growth rate)
-- Is it the ORM? (N+1 queries)
-- Should we cache? (read-heavy vs write-heavy)
-- Should we shard? (data distribution)
-</think hard>
+**Database optimization** (use `<think hard>`): Check query performance (EXPLAIN ANALYZE), connection pooling, indexing (missing/unused), data volume/growth, ORM issues (N+1), caching suitability, sharding needs.
 
-<think harder>
-Scaling strategy decision:
-- Horizontal vs Vertical scaling?
-  - Horizontal: Better fault tolerance, more complex
-  - Vertical: Simpler, limited by hardware
-- When is each appropriate?
-  - Horizontal: Stateless services, need resilience
-  - Vertical: Databases, memory-bound workloads
-- Cost implications? (2x instances vs 2x size)
-- Deployment complexity? (orchestration overhead)
-- Future growth? (5x in 6 months? 10x in 1 year?)
-</think harder>
+**Scaling strategy** (use `<think harder>`): Horizontal (fault-tolerant, complex, stateless) vs Vertical (simpler, hardware-limited, DBs/memory-bound). Evaluate cost (2x instances vs 2x size), orchestration overhead, and growth projections.
 
 ### Systematic Profiling (Anthropic Pattern)
 ```yaml
@@ -92,13 +65,7 @@ profiling_workflow:
 ## Optimization Protocol
 
 ### Phase 1: Performance Baseline
-<think>
-Baseline questions:
-- What's the current performance? (p50, p95, p99)
-- What's the target performance? (SLA requirements)
-- What's the gap? (how much improvement needed)
-- What's user-impacting? (perceived vs actual perf)
-</think>
+**Baseline assessment**: Measure current performance (p50/p95/p99), define target (SLA), quantify the gap, distinguish perceived vs actual user impact.
 
 1. Establish current performance metrics
 2. Run load tests (simulate production traffic)
@@ -120,16 +87,7 @@ wrk -t12 -c400 -d30s --latency https://api.example.com/endpoint
 ```
 
 ### Phase 2: Bottleneck Identification with Profiling
-<think hard>
-Profiling strategy:
-- CPU profiling: Find hot functions (flamegraphs)
-- Memory profiling: Find leaks, large allocations
-- I/O profiling: Find blocking operations
-- Network profiling: Find slow external calls
-- Database profiling: Find slow queries (EXPLAIN ANALYZE)
-
-Don't optimize blindly - measure first!
-</think hard>
+**Profiling strategy**: CPU (hot functions, flamegraphs), Memory (leaks, large allocations), I/O (blocking ops), Network (slow external calls), Database (slow queries via EXPLAIN ANALYZE). Never optimize blindly -- measure first.
 
 #### CPU Profiling
 ```python
@@ -193,15 +151,7 @@ LIMIT 20;
 ### Phase 3: Optimization Implementation
 
 #### Code-Level Optimization
-<think>
-Optimization targets (in order of impact):
-1. Algorithm complexity (O(n²) → O(n log n))
-2. Database queries (N+1 problem, missing indexes)
-3. Caching (reduce repeated work)
-4. Async I/O (don't block on network/disk)
-5. Data structures (use appropriate types)
-6. Micro-optimizations (last resort, often negligible)
-</think>
+**Optimization targets (by impact)**: 1) Algorithm complexity, 2) Database queries (N+1, indexes), 3) Caching, 4) Async I/O, 5) Data structures, 6) Micro-optimizations (last resort).
 
 Example optimizations:
 
@@ -293,18 +243,8 @@ CREATE UNIQUE INDEX ON user_order_summary(user_id);
 ```
 
 #### Caching Strategy (Multi-Level)
-<think>
-Caching levels:
-- L1: In-process memory (fastest, process-local)
-- L2: Redis/Memcached (fast, distributed)
-- L3: CDN (for static assets)
-
-Cache invalidation strategies:
-- TTL (time-based expiration)
-- Write-through (update cache on write)
-- Cache-aside (lazy loading)
-- Event-based (invalidate on specific events)
-</think>
+**Cache levels**: L1 in-process memory (fastest, process-local), L2 Redis/Memcached (fast, distributed), L3 CDN (static assets).
+**Invalidation strategies**: TTL (time-based), write-through (update on write), cache-aside (lazy load), event-based (invalidate on events).
 
 ```python
 # Multi-level caching implementation
@@ -358,14 +298,7 @@ def update_user_profile(user_id, updates):
 ### Phase 4: Auto-Scaling Configuration
 
 #### Horizontal Pod Autoscaler (Kubernetes)
-<think>
-HPA configuration considerations:
-- Min replicas: Baseline for handling normal traffic
-- Max replicas: Ceiling to prevent cost explosion
-- Target utilization: Sweet spot (70% CPU typical)
-- Scale-up: Fast (handle traffic spikes)
-- Scale-down: Slow (avoid flapping)
-</think>
+**HPA considerations**: Min replicas (baseline for normal traffic), max replicas (cost ceiling), target utilization (70% CPU typical), fast scale-up (handle spikes), slow scale-down (avoid flapping).
 
 ```yaml
 apiVersion: autoscaling/v2
@@ -455,13 +388,7 @@ load_balancer_config:
 ### Phase 5: Validation and Monitoring
 
 #### Load Testing
-<think>
-Load test strategy:
-- Baseline: Current production traffic (validate no regression)
-- Stress: 2x expected peak (ensure headroom)
-- Spike: Sudden 10x traffic (validate autoscaling)
-- Soak: Sustained load for hours (find memory leaks)
-</think>
+**Load test types**: Baseline (current traffic, no regression), Stress (2x peak, ensure headroom), Spike (sudden 10x, validate autoscaling), Soak (sustained hours, find memory leaks).
 
 ```python
 # Locust load test
@@ -533,14 +460,7 @@ scenarios:
 ## Cost Optimization
 
 ### Resource Right-Sizing
-<think>
-Right-sizing principles:
-- Measure actual usage over time (not peak snapshot)
-- Leave 20-30% headroom for spikes
-- Use burstable instances for variable workloads
-- Reserve instances for predictable base load
-- Spot instances for fault-tolerant workloads
-</think>
+**Right-sizing principles**: Measure actual usage over time (not peak snapshots), leave 20-30% headroom, burstable instances for variable workloads, reserved for predictable base load, spot for fault-tolerant workloads.
 
 ```bash
 # Analyze actual resource usage (Kubernetes)

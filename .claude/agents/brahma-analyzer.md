@@ -22,6 +22,8 @@ Cross-artifact analysis prevents implementation conflicts. Catch misalignments, 
 
 ## Anthropic Enhancements
 
+> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+
 ### Think Protocol for Conflict Resolution
 When detecting conflicts, use `<think>` to:
 - Analyze root cause of inconsistency
@@ -83,12 +85,7 @@ Project Artifacts:
 ### Phase 2: Consistency Analysis
 
 #### Constitution ↔ Specification
-<think>
-Before analyzing, consider:
-- What are the core principles we're validating against?
-- Which spec requirements have potential conflicts?
-- How do we prioritize principle violations?
-</think>
+**Pre-analysis**: Identify core principles, flag spec requirements with potential conflicts, prioritize principle violations.
 
 Verify specs align with project principles:
 - Code quality standards followed
@@ -98,12 +95,7 @@ Verify specs align with project principles:
 - UX guidelines respected
 
 #### Specification ↔ Plan
-<think>
-Key questions:
-- Does every requirement have an implementation approach?
-- Are there plan components without spec justification?
-- What's the coverage percentage threshold for acceptance?
-</think>
+**Coverage check**: Verify every requirement has an implementation approach, flag unjustified plan components, assess coverage percentage.
 
 Verify every spec requirement has plan coverage:
 - All user stories addressed
@@ -169,69 +161,32 @@ Testing:
 ### Phase 4: Conflict Detection with Think Protocol
 
 #### Naming Conflicts
-<think>
-When detecting naming inconsistency:
-1. What's the dominant convention in the codebase?
-2. What does the project constitution recommend?
-3. What's the industry standard for this tech stack?
-4. Which option minimizes refactoring?
-</think>
+**Resolution approach**: Check dominant codebase convention, constitution recommendation, industry standard, and minimize refactoring.
 
 ```
 ❌ CONFLICT: Spec calls it "userId", Plan uses "user_id", Tasks use "UserID"
-<think>
-- Codebase uses snake_case for database (70% of files)
-- Constitution recommends snake_case for backend
-- Python PEP-8 mandates snake_case
-- Minimal refactoring: standardize on snake_case
-</think>
+   Analysis: Codebase 70% snake_case, PEP-8 mandates snake_case, minimal refactoring.
 ✅ RESOLUTION: Standardize on snake_case: "user_id"
 
 ❌ CONFLICT: Spec requires "email", Plan has it optional
-<think>
-- Email is used for password reset (critical feature)
-- Constitution requires all auth fields mandatory
-- Optional email breaks forgot-password flow
-- Business requirement: email verification needed
-</think>
+   Analysis: Email needed for password reset, constitution requires mandatory auth fields.
 ✅ RESOLUTION: Update plan - email is required
 ```
 
 #### Logic Conflicts
-<think>
-For logic conflicts, analyze:
-- What's the user impact of each interpretation?
-- What does the constitution say about permissions?
-- Are there security implications?
-- Who needs to make the final decision?
-</think>
+**Resolution approach**: Assess user impact, check constitution on permissions, evaluate security implications, identify decision owner.
 
 ```
 ❌ CONFLICT:
   - Spec: "Users can delete their own posts"
   - Plan: "Only admins can delete posts"
-
-<think>
-- User empowerment vs moderation control
-- Constitution prioritizes user autonomy
-- Security: users can't delete others' posts (both approaches respect this)
-- UX: frustration if users can't delete own content
-- Business: low-moderation-overhead model preferred
-Decision: Spec is correct, plan needs update
-</think>
+   Analysis: Constitution prioritizes user autonomy; properly scoped to own posts only.
 ✅ RESOLUTION: Update plan to allow user self-deletion
 
 ❌ CONFLICT:
   - NFR: < 200ms response time
   - Plan: Synchronous payment processing (300ms+ latency)
-
-<think>
-- Performance SLA is non-negotiable (constitution)
-- Synchronous payment: simple but slow
-- Async payment: complex but meets SLA
-- Best practice: async payment processing standard
-Recommendation: Async processing with webhooks
-</think>
+   Analysis: Performance SLA non-negotiable; async payment is industry standard.
 ✅ RESOLUTION: Use async payment processing with webhooks
 ```
 
@@ -240,25 +195,13 @@ Recommendation: Async processing with webhooks
 ❌ CONFLICT:
   - Plan: Uses React 18
   - Tasks: npm install react@17
-
-<think>
-- React 18 features used in plan (concurrent rendering)
-- React 17 in tasks breaks implementation
-- Migration path: simple version bump
-- No breaking changes for our use case
-</think>
+   Analysis: React 18 features (concurrent rendering) required by plan; simple version bump, no breaking changes.
 ✅ RESOLUTION: Update tasks to React 18
 
 ❌ CONFLICT:
   - Task T015 depends on T020 output
   - Task T020 scheduled after T015
-
-<think>
-- T015 needs database migrations from T020
-- Circular dependency: NO
-- Wrong ordering: YES
-- Fix: simple reorder, no cascade effects
-</think>
+   Analysis: T015 needs database migrations from T020; wrong ordering, no circular dependency, simple reorder.
 ✅ RESOLUTION: Reorder tasks, T020 before T015
 ```
 
@@ -382,13 +325,7 @@ If NO, resolve these blockers:
    - **Plan**: Uses "user_id"
    - **Tasks**: Uses "UserID"
 
-   <think>
-   - Analyzed codebase convention: 70% snake_case
-   - Constitution: recommends snake_case for backend
-   - PEP-8 standard: snake_case
-   - Minimal refactoring approach
-   </think>
-
+   **Analysis**: Codebase 70% snake_case, constitution + PEP-8 both recommend snake_case, minimal refactoring.
    - **Resolution**: Standardize on snake_case "user_id"
    - **Impact**: Low - simple find/replace
 
@@ -396,13 +333,7 @@ If NO, resolve these blockers:
    - **Spec**: "Users can delete their own posts"
    - **Plan**: "Only admins can delete posts"
 
-   <think>
-   - User autonomy vs moderation control
-   - Constitution prioritizes user control
-   - Security: properly scoped to own posts only
-   - UX: frustration if can't delete own content
-   </think>
-
+   **Analysis**: Constitution prioritizes user autonomy, properly scoped to own posts only, UX frustration if blocked.
    - **Resolution**: Update plan - users can delete own posts
    - **Impact**: Medium - requires plan rewrite
 

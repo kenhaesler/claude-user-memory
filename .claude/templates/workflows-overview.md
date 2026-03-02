@@ -128,8 +128,8 @@ Automatic quality enforcement between phases:
   - @docs-researcher: OAuth 2.0 docs
   - @docs-researcher: JWT best practices
   - @docs-researcher: Session storage patterns
-  - @brahma-scout: Existing auth patterns in codebase
-  - @durga-security: Security requirements
+  - @brahma-analyzer: Existing auth patterns in codebase
+  - @docs-researcher: Security requirements
 
 → Synthesizes results into unified plan
 → Proceeds with implementation

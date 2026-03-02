@@ -22,20 +22,10 @@ Comprehensive observability enables proactive problem resolution. Three pillars:
 
 ## Anthropic Enhancements
 
+> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+
 ### Three Pillars Framework (Anthropic Pattern)
-<think>
-Why three pillars?
-- Metrics: What is happening? (aggregated trends)
-- Logs: Why is it happening? (detailed events)
-- Traces: Where is it happening? (request flow)
-
-Each pillar answers different questions:
-- Metrics alone: Know there's a problem, not what/where
-- Logs alone: Too much data, hard to spot trends
-- Traces alone: Individual requests, miss patterns
-
-Together: Complete observability
-</think>
+**Why three pillars**: Metrics (what is happening - trends), Logs (why - detailed events), Traces (where - request flow). Each alone is incomplete; together they provide complete observability.
 
 ```yaml
 three_pillars:
@@ -59,19 +49,7 @@ three_pillars:
 ```
 
 ### Think Protocol for Alert Configuration
-<think>
-Before creating alert:
-- Is this actionable? (can someone fix it?)
-- Is this urgent? (needs immediate attention?)
-- What's the false positive rate? (alert fatigue)
-- What's the impact of missing this? (risk assessment)
-- What action should responder take? (runbook needed?)
-
-Alert levels:
-- Critical: Page on-call (revenue-impacting, data loss)
-- Warning: Notify Slack (degradation, approaching limits)
-- Info: Log only (FYI, trend analysis)
-</think>
+**Before creating any alert**: Verify it is actionable, urgent, low false-positive rate, and has a runbook. Alert levels: Critical (page on-call: revenue/data-loss), Warning (Slack: degradation), Info (log only: trends).
 
 ### Context Engineering for Observability
 - Use structured logging (JSON format)
@@ -82,13 +60,7 @@ Alert levels:
 ## Monitoring Setup Protocol
 
 ### Phase 1: Instrumentation
-<think>
-Instrumentation strategy:
-- Start with Golden Signals (latency, traffic, errors, saturation)
-- Add business metrics (signups, conversions, revenue)
-- Include resource metrics (CPU, memory, disk, network)
-- Custom metrics for critical paths
-</think>
+**Instrumentation strategy**: Start with Golden Signals (latency, traffic, errors, saturation), add business metrics (signups, conversions, revenue), include resource metrics (CPU/memory/disk/network), custom metrics for critical paths.
 
 1. Add metrics endpoints to application (`/metrics`)
 2. Configure structured logging (JSON format with correlation IDs)
@@ -164,14 +136,7 @@ def endpoint():
 5. Create role-specific views (dev, ops, business)
 
 ### Phase 4: Alerting with Think Protocol
-<think>
-Alert design principles:
-- Every alert needs a runbook
-- Alerts should be actionable
-- Minimize false positives
-- Use composite alerts (multiple conditions)
-- Escalate appropriately
-</think>
+**Alert design principles**: Every alert needs a runbook, must be actionable, minimize false positives, use composite alerts (multiple conditions), escalate appropriately.
 
 1. Define SLI/SLO for services
 2. Create alert rules (critical vs warning)
@@ -255,13 +220,7 @@ business_kpis:
 ## Alert Rules (Think-First Design)
 
 ### Critical Alerts (Page Immediately)
-<think>
-Critical alert criteria:
-- User-impacting (service down, major errors)
-- Revenue-impacting (payments failing, checkout broken)
-- Data-loss risk (database issues, backup failures)
-- Security incidents (breach attempts, unauthorized access)
-</think>
+**Critical criteria**: User-impacting (service down, major errors), revenue-impacting (payments/checkout), data-loss risk (DB/backup failures), security incidents (breach/unauthorized access).
 
 ```yaml
 critical_alerts:
@@ -298,13 +257,7 @@ critical_alerts:
 ```
 
 ### Warning Alerts (Notify, Don't Page)
-<think>
-Warning alert criteria:
-- Trending toward problem (approaching thresholds)
-- Performance degradation (not yet user-impacting)
-- Resource constraints (still have headroom)
-- Business metric changes (worth investigating)
-</think>
+**Warning criteria**: Trending toward thresholds, performance degradation (not yet user-impacting), resource constraints with remaining headroom, business metric changes worth investigating.
 
 ```yaml
 warning_alerts:
@@ -341,19 +294,7 @@ warning_alerts:
 ## SLI/SLO Definition (Anthropic Pattern)
 
 ### Service Level Indicators (SLI)
-<think>
-Good SLIs are:
-- User-centric (what users experience)
-- Measurable (quantifiable)
-- Controllable (we can improve them)
-- Specific (clearly defined)
-
-Common SLIs:
-- Availability: successful requests / total requests
-- Latency: requests below threshold / total requests
-- Correctness: valid responses / total responses
-- Freshness: data age < threshold
-</think>
+**Good SLIs**: User-centric, measurable, controllable, specific. Common types: availability (success/total), latency (below threshold/total), correctness (valid/total), freshness (data age < threshold).
 
 ```yaml
 sli_definitions:
@@ -377,14 +318,7 @@ sli_definitions:
 ```
 
 ### Service Level Objectives (SLO)
-<think>
-SLO = SLI + Target + Time Window
-
-Example: 99.9% availability over 30 days
-- Allows: 43.2 minutes downtime per month
-- Error budget: 0.1% of requests
-- Use error budget for risky deployments
-</think>
+**SLO = SLI + Target + Time Window**. Example: 99.9% availability over 30 days allows 43.2 min downtime/month. Error budget (0.1%) can be spent on risky deployments.
 
 ```yaml
 slo_config:
@@ -510,16 +444,7 @@ def handle_request(request):
 - Cache operations (hit/miss rates)
 
 ### Sampling Strategy
-<think>
-Trace sampling strategy:
-- 100% sampling: Too expensive, storage issues
-- 0% sampling: Blind to request flow
-- Smart sampling:
-  - 100% of errors (always trace failures)
-  - 100% of slow requests (>1s)
-  - 1% of normal requests (representative sample)
-  - 100% of flagged users (debugging specific issues)
-</think>
+**Smart sampling**: 100% of errors, 100% of slow requests (>1s), 1% of normal requests (representative), 100% of flagged users (debugging). Avoids extremes of full sampling (too expensive) or none (blind).
 
 ## Available Tools
 

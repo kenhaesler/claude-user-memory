@@ -117,6 +117,20 @@ function Safe-Date {
     }
 }
 
+# Write file as UTF-8 without BOM (PS 5.1 Out-File -Encoding utf8 adds BOM)
+function Write-Utf8NoBom {
+    param(
+        [string]$FilePath,
+        [string]$Content,
+        [switch]$NoNewline
+    )
+    $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+    if (-not $NoNewline) {
+        $Content = $Content + [Environment]::NewLine
+    }
+    [System.IO.File]::WriteAllText($FilePath, $Content, $utf8NoBom)
+}
+
 # Parse JSON value
 function Parse-JsonValue {
     param(
@@ -228,7 +242,7 @@ function Acquire-Lock {
 
     # Create lock file with our PID
     try {
-        [System.Diagnostics.Process]::GetCurrentProcess().Id | Out-File -FilePath $script:LockFile -NoNewline
+        Write-Utf8NoBom -FilePath $script:LockFile -Content ([string][System.Diagnostics.Process]::GetCurrentProcess().Id) -NoNewline
     } catch {
         Log-Warning "Could not create lock file (continuing anyway)"
     }
@@ -363,7 +377,7 @@ function Invoke-PreflightChecks {
     # Check write permissions
     try {
         $testFile = Join-Path $HOME ".claude-install-write-test"
-        "test" | Out-File -FilePath $testFile -NoNewline
+        Write-Utf8NoBom -FilePath $testFile -Content "test" -NoNewline
         Remove-Item $testFile -Force
     } catch {
         Log-Error "No write permission to $HOME"
@@ -568,7 +582,7 @@ function SmartMerge-ClaudeMd {
         $merged = $sourceContent + "`n`n---`n`n# USER CUSTOMIZATIONS (preserved from previous installation)`n`n" + $targetContent
 
         $tmpFile = "$target.tmp"
-        $merged | Out-File -FilePath $tmpFile -Encoding utf8 -NoNewline
+        Write-Utf8NoBom -FilePath $tmpFile -Content $merged -NoNewline
 
         if (Test-Path $tmpFile) {
             Move-Item -Force $tmpFile $target
@@ -666,7 +680,8 @@ function Generate-Manifest {
         $data = Get-Content -Raw $script:ManifestTemplate | ConvertFrom-Json
         $data | Add-Member -NotePropertyName "installed_at" -NotePropertyValue $timestamp -Force
         $data | Add-Member -NotePropertyName "installed_by" -NotePropertyValue "install.ps1" -Force
-        $data | ConvertTo-Json -Depth 10 | Out-File -FilePath $manifest -Encoding utf8
+        $jsonStr = $data | ConvertTo-Json -Depth 10
+        Write-Utf8NoBom -FilePath $manifest -Content $jsonStr
         Log-Success "Installation manifest created"
     } catch {
         # Fallback: copy template as-is
@@ -688,7 +703,7 @@ function Write-VersionFile {
 
     $versionFile = Join-Path $script:ClaudeTarget ".agentic-substrate-version"
     try {
-        $VERSION | Out-File -FilePath $versionFile -Encoding utf8 -NoNewline
+        Write-Utf8NoBom -FilePath $versionFile -Content $VERSION -NoNewline
         Log-Success "Version file created: v$VERSION"
     } catch {
         Log-Warning "Failed to write version file"
@@ -746,7 +761,7 @@ try {
 "@
 
     try {
-        $rollbackContent | Out-File -FilePath $rollbackScript -Encoding utf8
+        Write-Utf8NoBom -FilePath $rollbackScript -Content $rollbackContent
         Log-Success "Rollback script created"
     } catch {
         Log-Warning "Failed to create rollback script"
@@ -859,6 +874,9 @@ function Main {
 
     # Acquire lock
     Acquire-Lock
+
+    # Ensure cleanup runs even on Ctrl+C (matches bash trap cleanup EXIT INT TERM)
+    Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action { Invoke-Cleanup } -SupportEvent
 
     try {
         # Detect install mode and clone if needed

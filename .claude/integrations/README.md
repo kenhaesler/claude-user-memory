@@ -23,7 +23,7 @@ Based on comprehensive research across 50+ authoritative sources (2024-2025), th
 
 **Multi-Agent Orchestration** (Anthropic Research 2024):
 - 90.2% performance improvement on complex tasks
-- Lead orchestrator (Claude Opus 4) + parallel workers (Claude Sonnet 4)
+- Lead orchestrator (Claude Opus 4.6) + parallel workers (Claude Sonnet 4.6)
 - Swarm pattern > Supervisor pattern (flat token usage vs. growing overhead)
 
 **State Management** (LangGraph Production Patterns):

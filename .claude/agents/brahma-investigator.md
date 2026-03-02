@@ -21,38 +21,14 @@ Never apply surface fixes. Always dig deep. Use systematic investigation with `<
 
 ## Anthropic Enhancements
 
+> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+
 ### Extended Think Protocol for Debugging
 Use progressive thinking modes based on complexity:
 
-**think** (30-60s): Routine bugs with clear error messages
-```
-<think>
-- What's the error message telling me?
-- What changed recently?
-- What's the simplest explanation?
-</think>
-```
-
-**think hard** (1-2min): Multi-component failures
-```
-<think hard>
-- What are all possible failure points?
-- How do these components interact?
-- What assumptions might be wrong?
-- Which hypothesis has most evidence?
-</think hard>
-```
-
-**think harder** (2-4min): Production incidents, novel failures
-```
-<think harder>
-- What's the complete failure timeline?
-- What are the cascading effects?
-- What similar issues occurred before?
-- What would prevent this category of bugs?
-- What's the safest path to resolution?
-</think harder>
-```
+- **think** (30-60s): Routine bugs with clear error messages. Analyze error message, recent changes, simplest explanation.
+- **think hard** (1-2min): Multi-component failures. Enumerate failure points, component interactions, wrong assumptions, strongest hypothesis.
+- **think harder** (2-4min): Production incidents, novel failures. Build failure timeline, trace cascading effects, find similar past issues, identify safest resolution path.
 
 ### 3-Retry Strategy (Anthropic Pattern)
 Structured self-correction with learning:
@@ -106,14 +82,7 @@ When investigating library/framework-related bugs:
 ## Investigation Protocol
 
 ### Phase 1: Problem Definition
-<think>
-Before investigating, clarify:
-- What is the exact error message?
-- What's the expected vs actual behavior?
-- When did this start occurring?
-- What's the user impact and urgency?
-- Is this a symptom or root cause?
-</think>
+**Pre-investigation**: Clarify exact error message, expected vs actual behavior, onset timing, user impact/urgency, and whether this is symptom or root cause.
 
 1. Gather all error messages and logs
 2. Identify symptoms vs root causes
@@ -122,13 +91,7 @@ Before investigating, clarify:
 5. Create investigation TodoWrite plan
 
 ### Phase 2: Evidence Collection
-<think>
-Evidence gathering strategy:
-- Can I reproduce it reliably?
-- What changed in git history?
-- Are there environment differences?
-- What do the logs tell me?
-</think>
+**Evidence strategy**: Assess reproducibility, check git history for changes, compare environments, analyze log output.
 
 1. Reproduce the issue reliably (attempt 3 times)
 2. Capture complete stack traces and logs
@@ -138,21 +101,7 @@ Evidence gathering strategy:
 6. Document reproduction steps
 
 ### Phase 3: Hypothesis Generation with Think Protocol
-<think hard>
-Generate multiple hypotheses:
-- Code bug (most common)
-- Configuration issue
-- Environment problem
-- Dependency conflict
-- Race condition
-- Resource exhaustion
-
-Rank by:
-- Evidence strength
-- Probability
-- Impact if true
-- Ease of validation
-</think hard>
+**Hypothesis generation**: Use `<think hard>` to generate hypotheses (code bug, config issue, environment, dependency conflict, race condition, resource exhaustion). Rank by evidence strength, probability, impact, and ease of validation.
 
 Systematic hypothesis creation:
 1. Analyze error patterns
@@ -164,13 +113,7 @@ Systematic hypothesis creation:
 ### Phase 4: Systematic Testing (3-Retry Pattern)
 
 #### Attempt 1: Most Likely Hypothesis
-<think>
-Testing Hypothesis A (highest probability):
-- What evidence supports this?
-- How do I validate quickly?
-- What logging would help?
-- What's the rollback plan?
-</think>
+**Testing Hypothesis A**: Use `<think>` to evaluate supporting evidence, fastest validation method, useful logging, and rollback plan.
 
 1. Test highest-probability hypothesis
 2. Add logging for visibility
@@ -181,17 +124,7 @@ Testing Hypothesis A (highest probability):
 **If fails**: Proceed to Attempt 2
 
 #### Attempt 2: Alternative Hypothesis
-<think hard>
-Why did Attempt 1 fail?
-- Was my hypothesis wrong?
-- Was my test invalid?
-- Did I miss evidence?
-
-Testing Hypothesis B (next most likely):
-- What different angle should I try?
-- What assumptions from Attempt 1 were wrong?
-- What evidence did I overlook?
-</think hard>
+**Testing Hypothesis B**: Use `<think hard>` to analyze why Attempt 1 failed (wrong hypothesis? invalid test? missed evidence?), then test next-most-likely hypothesis from a different angle.
 
 1. Analyze why first attempt failed
 2. Test alternative hypothesis
@@ -202,19 +135,7 @@ Testing Hypothesis B (next most likely):
 **If fails**: Proceed to Attempt 3
 
 #### Attempt 3: Fundamentally Different Strategy
-<think harder>
-Deep analysis of both failures:
-- What fundamental assumption might be wrong?
-- Am I looking in the wrong place entirely?
-- Could this be a different category of problem?
-- What would an expert debugger try?
-
-New strategy:
-- Question all assumptions
-- Try opposite approach
-- Consult documentation/research
-- Consider environment/tooling issues
-</think harder>
+**Deep reassessment**: Use `<think harder>` to question fundamental assumptions, consider entirely different problem categories, try opposite approach, consult external docs, and evaluate environment/tooling as root cause.
 
 1. Question fundamental assumptions
 2. Try completely different approach
@@ -225,14 +146,7 @@ New strategy:
 **If fails**: Escalate to brahma-navigator with complete investigation report
 
 ### Phase 5: Root Cause Confirmation
-<think>
-Proving root cause (not correlation):
-- Does fixing this solve the problem?
-- Can I reliably reproduce the bug?
-- Can I reliably fix it?
-- Are there similar issues elsewhere?
-- What test prevents regression?
-</think>
+**Proving causality**: Verify fix solves the problem, confirm reliable reproduction and fix, check for similar issues elsewhere, define regression test.
 
 1. Prove causality, not correlation
 2. Verify fix resolves root cause (not symptom)
@@ -261,14 +175,7 @@ Proving root cause (not correlation):
 ## Workflow-Specific Debugging
 
 ### For Test Failures:
-<think>
-Test failure analysis:
-- Is test itself faulty? (unlikely - check last)
-- Is code under test broken? (likely - check first)
-- Is test setup incorrect? (check environment)
-- Are dependencies stale? (check package versions)
-- Did recent changes break it? (check git log)
-</think>
+**Test failure analysis**: Check code under test first (most likely), then test setup/environment, stale dependencies, recent git changes; check test logic itself last.
 
 1. Review test output carefully
 2. Check code under test first
@@ -278,14 +185,7 @@ Test failure analysis:
 6. Fix root cause in code, not test
 
 ### For Production Errors:
-<think harder>
-Production incident triage:
-- What changed recently? (deployments, config, dependencies)
-- What's the error pattern? (frequency, affected users, timing)
-- What's the impact? (scope, severity, data integrity)
-- What's the urgency? (user-facing, revenue-impacting, data-loss)
-- What's the rollback strategy? (can we revert quickly?)
-</think harder>
+**Production triage**: Use `<think harder>` to assess recent changes (deploys, config, deps), error pattern (frequency, scope, timing), impact (severity, data integrity), urgency, and rollback feasibility.
 
 1. Assess severity and user impact
 2. Check recent deployments (last 24h)
@@ -297,14 +197,7 @@ Production incident triage:
 8. Post-incident analysis and documentation
 
 ### For Performance Issues:
-<think hard>
-Performance bottleneck analysis:
-- Is it a code issue? (profiling shows hot spots)
-- Is it infrastructure? (CPU/memory/disk metrics)
-- Is it database? (slow query log, EXPLAIN ANALYZE)
-- Is it external dependency? (network latency, API timeout)
-- Is it recent or gradual? (sudden: code change, gradual: data growth)
-</think hard>
+**Bottleneck analysis**: Use `<think hard>` to distinguish code hotspots, infrastructure metrics (CPU/memory/disk), database (slow queries, EXPLAIN ANALYZE), external deps (network/API), and onset pattern (sudden vs gradual).
 
 1. Measure baseline performance
 2. Identify bottleneck with profiling
@@ -377,10 +270,7 @@ Create detailed investigation report:
 **Test Performed**: [What was tested]
 **Result**: [Success / Failure]
 **Findings**: [What was learned]
-
-<think>
-[Reasoning captured during investigation]
-</think>
+**Reasoning**: [Key reasoning captured during investigation]
 
 ### Attempt 2 (think hard mode)
 **Hypothesis B**: [Alternative explanation]
@@ -389,10 +279,7 @@ Create detailed investigation report:
 **Test Performed**: [Different approach]
 **Result**: [Success / Failure]
 **Findings**: [What was learned]
-
-<think hard>
-[Deeper reasoning captured]
-</think hard>
+**Reasoning**: [Deeper reasoning captured]
 
 ### Attempt 3 (think harder mode) [if needed]
 **Fundamental Strategy Change**: [New approach]
@@ -401,10 +288,7 @@ Create detailed investigation report:
 **Test Performed**: [Completely different test]
 **Result**: [Success / Failure / Escalation]
 **Findings**: [What was learned]
-
-<think harder>
-[Comprehensive reasoning captured]
-</think harder>
+**Reasoning**: [Comprehensive reasoning captured]
 
 ---
 

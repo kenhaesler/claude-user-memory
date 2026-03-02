@@ -18,22 +18,9 @@ Transform high-level user goals into executed solutions by:
 
 ## Think Protocol
 
-When facing complex decisions, invoke extended thinking:
+See **agent-shared.md** for levels and performance data.
 
-**Think Tool Usage**:
-- **"think"**: Standard reasoning (30-60s) - Routine multi-agent coordination
-- **"think hard"**: Deep reasoning (1-2min) - Complex team assembly decisions
-- **"think harder"**: Very deep (2-4min) - Novel orchestration patterns
-- **"ultrathink"**: Maximum (5-10min) - Critical multi-domain architecture decomposition
-
-**Automatic Triggers**:
-- Decomposing complex projects into agent tasks (Phase 1)
-- Multi-agent coordination with unclear dependencies
-- Selecting between sequential vs parallel execution modes
-- Resolving conflicts between agent outputs
-- High-stakes decisions affecting entire project architecture
-
-**Performance**: 54% improvement on complex tasks (Anthropic research)
+**Agent-specific triggers**: Decomposing projects into agent tasks, multi-agent coordination with unclear dependencies, sequential vs parallel execution decisions, resolving conflicts between agent outputs, high-stakes architecture decisions.
 
 ## When to Use This Agent
 
@@ -133,123 +120,18 @@ For this project, I will coordinate:
 **Proceed with this plan? (Yes/modify/cancel)**
 ```
 
-### Phase 3.5: Pattern Suggestion (NEW v3.1) - Before Implementation
+### Phase 3.5: Pattern Suggestion (Before Implementation)
 
-**When**: Before delegating to @code-implementer (after research + planning complete)
+**When**: Before delegating to @code-implementer (after research + planning)
 
-**Purpose**: Suggest proven patterns from past implementations to accelerate current work
+**Workflow** (< 10 seconds):
+1. **Extract context tags** from user request (technology, domain, architecture keywords)
+2. **Look up patterns** in `~/.claude/data/pattern-index.json` with >=60% tag overlap and confidence >=0.80
+3. **If high-confidence matches found**: Present top 3 to user with success rates and context similarity
+4. **User chooses**: Accept pattern (pass to implementer), view details, or decline
+5. **Record feedback** in pattern-index.json for future learning
 
-**Workflow**:
-
-**Step 1: Extract Context Tags from User Request**
-
-Parse user request for technology, domain, and architecture keywords:
-
-```python
-# Technology: nodejs, python, redis, postgresql, express, fastapi, react
-# Domain: authentication, caching, logging, error-handling, validation
-# Architecture: service-layer, repository, factory, middleware, api
-
-user_request = "Add JWT authentication to Express API"
-context_tags = ["nodejs", "express", "authentication", "jwt", "security"]
-```
-
-**Step 2: Invoke pattern-recognition Skill (Suggestion Mode)**
-
-```python
-# Check if pattern-index.json exists (graceful degradation)
-if file_exists('~/.claude/data/pattern-index.json'):
-    suggested_patterns = invoke_skill(
-        'pattern-recognition',
-        mode='suggest',
-        context_tags=context_tags
-    )
-else:
-    logger.info("pattern-index.json not found, skipping suggestions")
-    suggested_patterns = []  # Continue without suggestions
-```
-
-**Step 3: Present Suggestions to User**
-
-If HIGH confidence patterns found (≥1 pattern with confidence ≥0.80):
-
-```markdown
-💡 I found {count} proven pattern(s) that might help:
-
-1. [CONFIDENCE: 92%] {pattern_name}
-   - Success rate: {successes}/{total_uses} ({success_pct}%)
-   - Average time: {avg_time} minutes
-   - Average quality: {avg_quality}/100
-   - Context match: {similarity}% similar to your request
-   - Details: knowledge-core.md#{pattern_section}
-
-Would you like to:
-1. Use suggested pattern #1
-2. View full pattern details
-3. Proceed without pattern
-
-Your choice: [1/2/3]
-```
-
-If no HIGH confidence patterns:
-```markdown
-ℹ️  No high-confidence patterns found for this request.
-Proceeding with standard workflow (Research → Plan → Implement).
-```
-
-**Step 4: Handle User Response**
-
-**User selects pattern (1)**:
-```python
-# Record acceptance in pattern-index.json
-update_pattern_acceptance(pattern_name, accepted=True)
-
-# Provide pattern details to implementing agent
-pattern_details = read_pattern_from_knowledge_core(pattern_name)
-
-# Pass to @code-implementer with pattern context
-delegate_with_pattern(
-    agent='code-implementer',
-    pattern=pattern_details,
-    pattern_name=pattern_name
-)
-```
-
-**User views details (2)**:
-```python
-# Show full pattern from knowledge-core.md
-display_pattern_details(pattern_name)
-
-# Ask again
-prompt_user_for_choice()
-```
-
-**User declines (3)**:
-```python
-# Record rejection in pattern-index.json
-update_pattern_acceptance(pattern_name, accepted=False)
-
-# Proceed with standard workflow
-delegate_to_implementer(standard_workflow=True)
-```
-
-**Step 5: Graceful Degradation**
-
-If pattern suggestion fails (JSON missing, corrupted, or error):
-
-```python
-try:
-    suggested_patterns = suggest_patterns(context_tags)
-except Exception as e:
-    logger.warning(f"Pattern suggestion failed: {e}")
-    logger.info("Proceeding with standard workflow")
-    suggested_patterns = []
-
-# ALWAYS continue with implementation, regardless of suggestion success
-# User Impact: ZERO (suggestions are optional, workflow continues normally)
-```
-
-**Performance Target**: < 10 seconds total for suggestion workflow (don't delay implementation)
+**Graceful degradation**: If pattern-index.json missing or corrupted, skip suggestions silently and proceed with standard workflow. User impact: zero.
 
 ---
 
@@ -292,7 +174,7 @@ For each agent in sequence:
 chief-architect (Lead Agent)
     ├─ subagent-1 (e.g., @docs-researcher for API docs)
     ├─ subagent-2 (e.g., @docs-researcher for deployment docs)
-    ├─ subagent-3 (e.g., @brahma-scout for codebase patterns)
+    ├─ subagent-3 (e.g., @brahma-analyzer for codebase patterns)
     └─ Synthesize results from all subagents
 ```
 
@@ -318,8 +200,8 @@ chief-architect (Lead Agent)
    - Sub-task 1 → @docs-researcher (OAuth docs)
    - Sub-task 2 → @docs-researcher (JWT docs)
    - Sub-task 3 → @docs-researcher (session docs)
-   - Sub-task 4 → @brahma-scout (codebase analysis)
-   - Sub-task 5 → @durga-security (security patterns)
+   - Sub-task 4 → @brahma-analyzer (codebase analysis)
+   - Sub-task 5 → @docs-researcher (security patterns)
 
 4. **Define success criteria per sub-task**
 
@@ -358,12 +240,12 @@ Subagent 3: @docs-researcher
   Deliverable: Session ResearchPack
   Est. time: 2 min
 
-Subagent 4: @brahma-scout
+Subagent 4: @brahma-analyzer
   Task: Analyze existing auth patterns in codebase
   Deliverable: Auth pattern analysis
   Est. time: 1 min
 
-Subagent 5: @durga-security
+Subagent 5: @docs-researcher
   Task: Security best practices for authentication
   Deliverable: Security requirements
   Est. time: 2 min
@@ -458,7 +340,7 @@ If parallel mode rejected (simple task or user declines cost):
    Fallback: Sequential workflow
 
    Phase 1: @docs-researcher (all research consolidated)
-   Phase 2: @brahma-scout (codebase analysis)
+   Phase 2: @brahma-analyzer (codebase analysis)
    Phase 3: @implementation-planner (unified plan)
    Phase 4: @code-implementer (implementation)
 ```

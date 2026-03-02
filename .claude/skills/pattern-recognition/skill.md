@@ -58,15 +58,7 @@ Return top 3 patterns
 ```
 
 **Graceful Degradation**:
-```python
-try:
-    pattern_index = read_json('~/.claude/data/pattern-index.json')
-    suggestions = suggest_patterns(context_tags, pattern_index)
-except (FileNotFoundError, JSONDecodeError):
-    logger.warning("pattern-index.json unavailable, skipping suggestions")
-    suggestions = []  # Proceed without suggestions
-    # User impact: ZERO (workflow continues normally)
-```
+If `~/.claude/data/pattern-index.json` is missing or corrupted, skip suggestions silently and proceed with standard workflow. User impact: zero.
 
 **Step 3: Present Suggestions** (user interaction)
 
@@ -277,204 +269,32 @@ Version: [increment version number]
 
 ### Step 5: Outcome Metrics Capture (< 10 seconds) - NEW v3.1
 
-**Purpose**: Track implementation outcomes for pattern learning and confidence scoring
+**Purpose**: Track implementation outcomes for pattern learning and confidence scoring.
 
-**Metrics to Capture**:
+**Metrics to capture**:
+- **Success/Failure**: all tests passing AND quality gates passed AND no rollback required
+- **Duration**: minutes from code-implementer start to tests passing
+- **Quality score**: average of research and plan scores (if available from /workflow)
+- **Self-correction count**: 0-3 range from code-implementer retries (lower is better)
+- **User acceptance**: whether user accepted a suggested pattern
 
-1. **Success/Failure Classification**:
-   ```python
-   success = (
-       all_tests_passing AND
-       quality_gates_passed AND
-       no_rollback_required
-   )
-   ```
-
-2. **Implementation Duration**:
-   ```python
-   duration_minutes = (end_time - start_time).total_seconds() / 60
-   # Start time: When @code-implementer begins
-   # End time: When tests pass and implementation complete
-   ```
-
-3. **Quality Scores** (if available from /workflow):
-   ```python
-   quality_score = (research_pack_score + implementation_plan_score) / 2
-   # Only available if full workflow used (research + plan phases)
-   ```
-
-4. **Self-Correction Count**:
-   ```python
-   retry_count = number_of_self_correction_attempts
-   # Reported by @code-implementer (0-3 range, lower is better)
-   ```
-
-5. **User Acceptance** (if pattern was suggested):
-   ```python
-   pattern_was_accepted = user_selected_yes_to_suggestion
-   ```
-
-**Data Structure**:
-```python
-outcome_metrics = {
-    "success": True,  # or False
-    "duration_minutes": 12.5,
-    "quality_score": 87,  # or None if not available
-    "retry_count": 1,
-    "pattern_used": "JWT Authentication Middleware Pattern",  # or None
-    "pattern_was_suggested": True,
-    "pattern_was_accepted": True,
-    "timestamp": "2025-10-25T14:30:00Z"
-}
-```
-
-**Capture Process**:
-1. Collect metrics from @code-implementer at end of implementation
-2. Classify success/failure based on tests and quality gates
-3. Calculate duration from timestamps
-4. Retrieve quality scores from research/plan phases (if available)
-5. Package into outcome_metrics structure
-6. Pass to pattern-index.json update step
+Package into `outcome_metrics` dict with keys: `success`, `duration_minutes`, `quality_score`, `retry_count`, `pattern_used`, `pattern_was_suggested`, `pattern_was_accepted`, `timestamp`.
 
 ---
 
 ### Step 6: pattern-index.json Update (< 15 seconds) - NEW v3.1
 
-**Purpose**: Update pattern metrics for adaptive learning and future suggestions
+**Purpose**: Update pattern metrics for adaptive learning and future suggestions.
 
-**Update Workflow**:
+**Update workflow**:
+1. **Read** `~/.claude/data/pattern-index.json` (graceful degradation: if missing/corrupted, skip and continue)
+2. **Find or create** pattern entry with conservative defaults (confidence: 0.5/MEDIUM for new patterns)
+3. **Update metrics**: increment `total_uses`, update `successes`/`failures`, recalculate running averages for time and quality (keep last 10 quality scores), update timestamps and self-correction averages
+4. **Recalculate confidence** using the Bayesian algorithm in Step 7
+5. **Check anti-pattern status**: If 3+ consecutive failures with 0 successes, mark as anti-pattern. If user rejection rate >70% after 3+ suggestions, reduce confidence by 20%
+6. **Write** updated JSON, update metadata totals, validate JSON integrity
 
-**1. Read Current pattern-index.json**:
-```python
-try:
-    pattern_index = read_json('~/.claude/data/pattern-index.json')
-except (FileNotFoundError, JSONDecodeError):
-    logger.warning("pattern-index.json missing/corrupted, skipping metrics update")
-    return  # Continue with knowledge-core.md update only (graceful degradation)
-```
-
-**2. Find or Create Pattern Entry**:
-```python
-pattern_name = "JWT Authentication Middleware Pattern"  # From pattern recognition
-
-if pattern_name not in pattern_index['patterns']:
-    # Create new pattern entry with conservative defaults
-    pattern_index['patterns'][pattern_name] = {
-        "pattern_id": generate_kebab_case_id(pattern_name),
-        "total_uses": 0,
-        "successes": 0,
-        "failures": 0,
-        "avg_time_minutes": 0,
-        "avg_quality_score": 0,
-        "quality_scores": [],
-        "last_used": today_iso(),
-        "first_used": today_iso(),
-        "confidence": 0.5,  # Start conservative (MEDIUM)
-        "confidence_level": "MEDIUM",
-        "context_tags": extract_tags_from_pattern(),
-        "related_patterns": [],
-        "anti_pattern": False,
-        "deprecation_warning": None,
-        "user_acceptance_rate": 0.0,
-        "self_correction_avg": 0.0
-    }
-```
-
-**3. Update Metrics**:
-```python
-pattern = pattern_index['patterns'][pattern_name]
-
-# Increment usage
-pattern['total_uses'] += 1
-
-# Update success/failure counts
-if outcome_metrics['success']:
-    pattern['successes'] += 1
-else:
-    pattern['failures'] += 1
-
-# Update time metrics (running average)
-if outcome_metrics['duration_minutes'] > 0:
-    old_avg = pattern['avg_time_minutes']
-    old_count = pattern['total_uses'] - 1
-    pattern['avg_time_minutes'] = round(
-        (old_avg * old_count + outcome_metrics['duration_minutes']) / pattern['total_uses'],
-        2
-    )
-
-# Update quality scores (keep last 10 to prevent bloat)
-if outcome_metrics['quality_score'] is not None:
-    pattern['quality_scores'].append(outcome_metrics['quality_score'])
-    pattern['quality_scores'] = pattern['quality_scores'][-10:]  # Keep last 10 only
-    pattern['avg_quality_score'] = round(
-        sum(pattern['quality_scores']) / len(pattern['quality_scores']),
-        2
-    )
-
-# Update timestamps
-pattern['last_used'] = today_iso()
-
-# Update user acceptance rate (if pattern was suggested)
-if outcome_metrics.get('pattern_was_suggested'):
-    old_rate = pattern['user_acceptance_rate']
-    old_suggestions = pattern.get('total_suggestions', 0)
-    new_suggestions = old_suggestions + 1
-    accepted = 1 if outcome_metrics.get('pattern_was_accepted') else 0
-    pattern['user_acceptance_rate'] = round(
-        (old_rate * old_suggestions + accepted) / new_suggestions,
-        2
-    )
-    pattern['total_suggestions'] = new_suggestions
-
-# Update self-correction average
-old_avg_retries = pattern['self_correction_avg']
-pattern['self_correction_avg'] = round(
-    (old_avg_retries * (pattern['total_uses'] - 1) + outcome_metrics['retry_count']) / pattern['total_uses'],
-    2
-)
-```
-
-**4. Recalculate Confidence** (using algorithm from Step 7 below):
-```python
-pattern['confidence'] = calculate_confidence(pattern)
-pattern['confidence_level'] = classify_confidence_level(pattern['confidence'])
-```
-
-**5. Check for Anti-Pattern Status**:
-```python
-# If pattern failed 3+ times consecutively with no successes, mark as anti-pattern
-if pattern['failures'] >= 3 and pattern['successes'] == 0:
-    pattern['anti_pattern'] = True
-    pattern['deprecation_warning'] = "This pattern has failed repeatedly. Consider alternatives."
-
-# If pattern rejected 3+ times, reduce confidence
-if pattern.get('total_suggestions', 0) >= 3 and pattern['user_acceptance_rate'] < 0.30:
-    pattern['confidence'] *= 0.8  # Reduce by 20%
-    pattern['deprecation_warning'] = "This pattern has been rejected frequently."
-```
-
-**6. Write Updated JSON**:
-```python
-# Update metadata
-pattern_index['metadata']['total_implementations'] += 1
-pattern_index['metadata']['last_updated'] = today_iso()
-
-# Recalculate overall success rate
-total_successes = sum(p['successes'] for p in pattern_index['patterns'].values())
-total_uses = sum(p['total_uses'] for p in pattern_index['patterns'].values())
-pattern_index['metadata']['overall_success_rate'] = round(
-    total_successes / total_uses if total_uses > 0 else 0.0,
-    2
-)
-
-# Write updated JSON
-write_json('~/.claude/data/pattern-index.json', pattern_index)
-
-# Validate JSON is still valid
-verify_json_valid('~/.claude/data/pattern-index.json')
-```
-
-**Performance Target**: < 15 seconds for complete metrics update
+**Performance target**: < 15 seconds for complete update.
 
 ---
 

@@ -32,6 +32,7 @@
     "validators/circuit-breaker.sh",
     "metrics/tracker.sh",
     "templates/agentic-substrate-personal.md.example",
+    "templates/agent-shared.md",
     "templates/agents-overview.md",
     "templates/CLAUDE.md.template",
     "templates/CLAUDE.md.user-level",
@@ -85,7 +86,7 @@
     }
   },
   "metadata": {
-    "total_files": 36,
+    "total_files": 37,
     "agents": 9,
     "skills": 5,
     "commands": 5,
