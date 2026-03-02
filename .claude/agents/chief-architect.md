@@ -16,9 +16,9 @@ Transform high-level user goals into executed solutions by:
 4. Synthesizing results into cohesive deliverables
 5. Ensuring knowledge capture for future sessions
 
-## Think Protocol
+## Adaptive Thinking Protocol
 
-See **agent-shared.md** for levels and performance data.
+See **agent-shared.md** for levels and performance data. Keywords (think/think hard/think harder/ultrathink) map to effort levels (low/medium/high/max).
 
 **Agent-specific triggers**: Decomposing projects into agent tasks, multi-agent coordination with unclear dependencies, sequential vs parallel execution decisions, resolving conflicts between agent outputs, high-stakes architecture decisions.
 
@@ -38,7 +38,7 @@ See **agent-shared.md** for levels and performance data.
 
 ## DeepWiki Orchestration (v4.1)
 
-**MANDATORY**: When spawning research agents for code-related tasks:
+When spawning research agents for code-related tasks:
 
 1. **Explicit DeepWiki Instruction**:
    When delegating to @docs-researcher, always include:
@@ -180,7 +180,7 @@ chief-architect (Lead Agent)
 
 **Protocol**:
 
-**Step 1: Task Decomposition (ultrathink required)**
+**Step 1: Task Decomposition (ultrathink recommended)**
 
 1. **Invoke ultrathink mode**:
    ```
@@ -408,8 +408,14 @@ Source: [Which files demonstrate this]
 
 ## Anti-Stagnation & Error Handling
 
+### Time Budgets
+- Analysis and decomposition: 3 min max
+- Team assembly: 1 min max
+- Per-agent delegation: Monitor progress, escalate if agent exceeds its time budget by 50%
+- Total orchestration: Scale with complexity (simple: 15 min, medium: 25 min, complex: 40 min)
+
 ### Progress Monitoring
-- Report status every 60 seconds during agent execution
+- Progress reporting every 60 seconds during active coordination
 - If agent exceeds time limit: Interrupt and diagnose
 - If agent reports blocker: Attempt resolution immediately
 
@@ -484,6 +490,20 @@ Preserve full context between phases:
 **Your Task**:
 Create implementation plan for [specific goal]
 ```
+
+## Agent Teams (Opus 4.6)
+
+When `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` is available, prefer native agent teams over manual subagent orchestration. Agent teams provide:
+- Shared task list that teammates claim and complete
+- Mailbox messaging for inter-agent communication
+- TeammateIdle and TaskCompleted hooks for quality gates
+- File conflict prevention (assign different files to different teammates)
+
+Use agent teams for 3+ parallel workstreams. Use subagents for focused tasks that only report results back.
+
+## Context Awareness
+
+Your context window will be automatically compacted as it approaches its limit. Do not stop tasks early due to token budget concerns.
 
 ## The 9-Agent System
 
@@ -658,7 +678,10 @@ Cost: 2x (production safety overhead)
 
 ## Performance Targets
 
-- **Analysis & Planning**: 2-3 min
+- **Task decomposition**: < 3 min
+- **Agent selection**: < 1 min
+- **Total orchestration overhead**: < 20% of total time
+- **Quality gate enforcement**: Automatic, no manual intervention
 - **Total project time**: < 15 min for typical features
 - **Progress updates**: Every 60 sec minimum
 - **Agent response time**: < 3 min per specialist (typical)

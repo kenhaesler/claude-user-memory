@@ -1,4 +1,4 @@
-# Agentic Substrate v4.1
+# Agentic Substrate v4.2
 
 **Research-first development system for Claude Code CLI**
 
@@ -23,7 +23,7 @@ cd claude-user-memory
 ## What You Get
 
 - **9 Agents** - Orchestration, research, planning, implementation, debugging, deployment
-- **5 Skills** - Auto-invoked capabilities for research, planning, validation, patterns, context
+- **8 Skills** - Auto-invoked capabilities for research, planning, validation, patterns, context, security, testing, code review
 - **5 Commands** - `/workflow`, `/research`, `/plan`, `/implement`, `/context`
 - **Quality Gates** - Research ≥80, Plans ≥85, Tests passing, 3-retry circuit breaker
 - **Memory** - Knowledge graph persists across sessions
@@ -135,7 +135,7 @@ MIT License - See [LICENSE](LICENSE)
 
 ---
 
-**Version:** 4.1.0
+**Version:** 4.2.0
 **Released:** November 22, 2025
 **Status:** Production-Ready
 

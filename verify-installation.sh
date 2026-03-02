@@ -50,11 +50,11 @@ echo ""
 # Check skills
 echo "🧠 Checking skills..."
 SKILL_COUNT=$(find "$CLAUDE_DIR/skills" -name "skill.md" 2>/dev/null | wc -l | tr -d ' ')
-if [ "$SKILL_COUNT" -eq 5 ]; then
-    check_pass "All 5 skills installed"
+if [ "$SKILL_COUNT" -eq 8 ]; then
+    check_pass "All 8 skills installed"
     check_info "$(ls -d $CLAUDE_DIR/skills/*/ | xargs -n1 basename | sed 's/^/    - /')"
 else
-    check_fail "Expected 5 skills, found $SKILL_COUNT"
+    check_fail "Expected 8 skills, found $SKILL_COUNT"
 fi
 echo ""
 
@@ -116,10 +116,10 @@ echo ""
 # Check templates
 echo "📝 Checking templates..."
 TEMPLATE_COUNT=$(find "$CLAUDE_DIR/templates" -type f 2>/dev/null | wc -l | tr -d ' ')
-if [ "$TEMPLATE_COUNT" -eq 6 ]; then
-    check_pass "All 6 templates installed"
+if [ "$TEMPLATE_COUNT" -eq 7 ]; then
+    check_pass "All 7 templates installed"
 else
-    check_fail "Expected 6 templates, found $TEMPLATE_COUNT"
+    check_fail "Expected 7 templates, found $TEMPLATE_COUNT"
     check_info "Found: $(find $CLAUDE_DIR/templates -type f | xargs -n1 basename | sed 's/^/    - /')"
 fi
 echo ""

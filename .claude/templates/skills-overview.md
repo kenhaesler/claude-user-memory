@@ -1,6 +1,6 @@
 # Skills Overview
 
-The Agentic Substrate provides 5 auto-invoked skills that enhance agent capabilities:
+The Agentic Substrate provides 8 auto-invoked skills that enhance agent capabilities:
 
 ## 1. research-methodology
 **Purpose**: Systematic approach for gathering authoritative documentation
@@ -74,10 +74,64 @@ The Agentic Substrate provides 5 auto-invoked skills that enhance agent capabili
 
 **Performance**: 39% improvement, 84% token reduction (Anthropic research)
 
+**Compaction API (Opus 4.6)**: Server-side automatic context compaction supplements manual curation. Long sessions run indefinitely without context window limits, but manual curation remains valuable for keeping high-signal information accessible.
+
 **Commands**:
 - `/context analyze` - Show current context configuration
 - `/context optimize` - Automatically prune stale context
 - `/context reset` - Fresh start for new projects
+
+## 6. security-validation
+**Purpose**: Systematic security analysis for code changes
+
+**Auto-invokes when**:
+- Before `code-implementer` commits (post-implementation gate)
+- During `brahma-analyzer` validation
+- When code touches auth, crypto, user input, SQL, or external APIs
+
+**What it does**:
+- Secrets detection (API keys, passwords, tokens in code)
+- Injection prevention (SQL, XSS, command injection, path traversal)
+- Auth & crypto validation (weak hashing, insecure tokens)
+- Dependency risk assessment (known CVEs, typosquatting)
+
+**Pass threshold**: 80/100 (any category scoring 0 blocks commit)
+
+**Key principle**: Shift left - find security issues before production
+
+## 7. testing-methodology
+**Purpose**: Systematic test strategy and design methodology
+
+**Auto-invokes when**:
+- During RED phase of TDD (before writing tests)
+- When `code-implementer` starts implementation
+- When user asks about testing strategy
+
+**What it does**:
+- Test type selection (unit vs integration vs e2e decision tree)
+- Edge case generation (boundary analysis, null/empty/max, error paths)
+- Coverage strategy (80% line, 100% critical paths, happy + sad + edge)
+- Test quality assessment (isolation, determinism, readability, coverage)
+
+**Key principle**: Test behavior, not implementation
+
+## 8. code-review
+**Purpose**: Systematic code review for pre-commit quality assurance
+
+**Auto-invokes when**:
+- After `code-implementer` finishes but before git commit
+- When user explicitly requests review
+- During `brahma-analyzer` consistency checks
+
+**What it does**:
+- Anti-pattern detection (god objects, deep nesting, magic numbers, duplication)
+- Naming & convention checks (consistent casing, descriptive names)
+- Complexity analysis (cyclomatic complexity, function length, parameter count)
+- Over-engineering detection (premature abstraction, unused generics, speculative features)
+
+**Pass threshold**: 75/100
+
+**Key principle**: Consistency over perfection
 
 ## Integration
 
@@ -92,9 +146,13 @@ All skills work together automatically:
 3. planning-methodology → Creates minimal-change plan (< 3 min)
    quality-validation → Validates Implementation Plan (85+ score)
 
-4. [code-implementer executes with TDD]
+4. testing-methodology → Guides test design (RED phase)
+   [code-implementer executes with TDD]
 
-5. pattern-recognition → Captures caching pattern to knowledge-core.md
+5. code-review → Checks for anti-patterns, complexity (pre-commit)
+   security-validation → Scans for vulnerabilities, secrets (pre-commit)
+
+6. pattern-recognition → Captures caching pattern to knowledge-core.md
    context-engineering → Archives completed work, loads next task context
 ```
 

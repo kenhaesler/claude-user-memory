@@ -2,7 +2,7 @@
 # Agentic Substrate v4.1 - Robust Cross-Platform Installation
 # Works on: macOS, Linux, WSL, minimal containers, with/without Python
 
-VERSION="4.1.0"
+VERSION="4.2.0"
 
 # ============================================================================
 # GLOBAL VARIABLES
@@ -802,7 +802,7 @@ display_summary() {
     echo "Installation Summary:"
     echo "  Location: $CLAUDE_TARGET"
     echo "  Version: $VERSION"
-    echo "  Agents: 9 | Skills: 5 | Commands: 5"
+    echo "  Agents: 9 | Skills: 8 | Commands: 5"
     echo ""
 
     if [ -n "$BACKUP_LOCATION" ]; then

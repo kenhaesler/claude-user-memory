@@ -14,7 +14,7 @@ NC='\033[0m'
 echo "🔍 Validating Implementation Plan..."
 
 # Find recent plan file
-PLAN_FILES=$(find . -name "*Plan*.md" -o -name "*Implementation*.md" | grep -v node_modules | head -1)
+PLAN_FILES=$(find . \( -name "*Plan*.md" -o -name "*Implementation*.md" \) -mmin -30 | grep -v node_modules | head -1)
 
 if [ -z "$PLAN_FILES" ]; then
     echo -e "${YELLOW}⚠️  No Implementation Plan found${NC}"
@@ -183,5 +183,5 @@ else
     echo "   Recommendation: Re-run @implementation-planner focusing on missing elements"
     echo "   Required score: 85/100 (current: $SCORE/100)"
     echo ""
-    exit 0  # Changed to warn instead of block - set to exit 1 to block
+    exit 1  # Block implementation when quality gate fails
 fi

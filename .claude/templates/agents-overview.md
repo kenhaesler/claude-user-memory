@@ -82,7 +82,7 @@ The Agentic Substrate provides **9 specialized agents** that work together acros
 - Ensures traceability and completeness
 - Multi-modal quality scoring (80+ required for pass)
 
-**Think Protocol**: Uses extended thinking for complex conflict resolution
+**Think Protocol**: Uses adaptive thinking for complex conflict resolution
 
 **Quality Gate**: Analysis must pass (80+ score) before implementation
 
@@ -282,6 +282,11 @@ The Agentic Substrate provides **9 specialized agents** that work together acros
 - ✅ Coverage complete
 - ⛔ Blocks implementation if fails
 
+**Implementation → Pre-Commit (Gate 3.5)**:
+- ✅ Code review score ≥ 75 (code-review skill)
+- ✅ Security validation score ≥ 80 (security-validation skill)
+- ⛔ Blocks commit if security or quality issues found
+
 **Implementation → Completion**:
 - ✅ All tests passing
 - ✅ Circuit breaker closed
@@ -297,7 +302,7 @@ From Anthropic research and Agentic Substrate testing:
 **Accuracy**:
 - Research: +49-67% with contextual retrieval
 - Multi-agent: +90.2% on complex tasks
-- Extended thinking: +54% on complex problems
+- Adaptive thinking: +54% on complex problems
 
 **Speed**:
 - Research: < 2 min (version-accurate docs)
@@ -312,16 +317,23 @@ From Anthropic research and Agentic Substrate testing:
 
 ---
 
-## EXTENDED THINKING PROTOCOLS
+## ADAPTIVE THINKING PROTOCOLS (Opus 4.6)
 
-All agents support extended thinking modes:
+All agents support adaptive thinking modes. On Opus 4.6, interleaved thinking is automatic -- agents reason between tool calls without explicit prompting, leading to better agentic decision-making.
 
-- **"think"** (30-60s): Routine planning, standard decisions
-- **"think hard"** (1-2min): Multiple valid approaches, unclear tradeoffs
-- **"think harder"** (2-4min): Novel problems, high-stakes decisions
-- **"ultrathink"** (5-10min): Critical architecture, multi-agent coordination
+| Keyword | Effort Level | Duration | Use For |
+|---------|-------------|----------|---------|
+| **"think"** | Standard | 30-60s | Routine planning, standard decisions |
+| **"think hard"** | High | 1-2min | Multiple valid approaches, unclear tradeoffs |
+| **"think harder"** | Very High | 2-4min | Novel problems, high-stakes decisions |
+| **"ultrathink"** | Maximum | 5-10min | Critical architecture, multi-agent coordination |
 
 **Performance**: 54% improvement on complex tasks (Anthropic research)
+
+**Opus 4.6 enhancements**:
+- Interleaved thinking is automatic between tool calls (no explicit trigger needed)
+- Adaptive effort: The model adjusts reasoning depth based on task complexity
+- Streaming thinking: Reasoning tokens are generated inline for better agentic loops
 
 **Auto-triggered for**:
 - Complex tool operations (irreversible effects)
@@ -353,8 +365,6 @@ All agents support extended thinking modes:
 - 3-5x faster development for new capabilities
 - 40+ pre-built tools
 - Built-in memory (short/long-term + entity)
-
-See `SELF-ENHANCEMENT-BLUEPRINT.md` for complete V4.0 roadmap.
 
 ---
 

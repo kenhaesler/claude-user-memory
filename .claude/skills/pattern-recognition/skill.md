@@ -609,4 +609,7 @@ This algorithm is implemented in bash for standalone calculation and testing. Th
 
 ---
 
+### Opus 4.6 Note
+Opus 4.6's adaptive thinking enables deeper pattern analysis. When evaluating patterns, use "think hard" for complex pattern classification and "think harder" for cross-domain pattern synthesis.
+
 **This skill ensures institutional knowledge is captured automatically AND learns from outcomes to suggest proven patterns proactively, making future implementations 30-40% faster.**

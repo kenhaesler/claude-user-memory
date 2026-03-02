@@ -44,8 +44,8 @@ function test_manifest() {
     # Check file count
     COUNT=$(python3 -c "import json; print(len(json.load(open('$CLAUDE_TARGET/.agentic-substrate-manifest.json'))['managed_files']))" 2>/dev/null || echo "0")
 
-    if [ "$COUNT" -ne 35 ]; then
-        echo "❌ Manifest incomplete: $COUNT files (expected 35)"
+    if [ "$COUNT" -ne 42 ]; then
+        echo "❌ Manifest incomplete: $COUNT files (expected 42)"
         ((ERRORS++))
         return 1
     fi

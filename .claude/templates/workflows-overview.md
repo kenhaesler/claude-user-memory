@@ -56,17 +56,23 @@ Automatic quality enforcement between phases:
 - Requires: rollback strategy, file list, step-by-step sequence
 - Blocks coding if plan unsafe or incomplete
 
-**Gate 3: Implementation → Completion**
+**Gate 3: Implementation → Pre-Commit**
 - All tests must pass (TDD enforced)
 - Self-correction attempts if failures (max 3)
 - Circuit breaker prevents infinite loops
+
+**Gate 3.5: Pre-Commit Quality & Security**
+- Code review score ≥ 75 (code-review skill)
+- Security validation score ≥ 80 (security-validation skill)
+- Blocks commit if quality or security issues found
 
 ## TDD Workflow (Mandatory)
 
 **RED-GREEN-REFACTOR Cycle**:
 
-1. **RED**: Write failing test (2-3 min)
-   - Create test file
+1. **RED**: Write failing test (2-3 min) — *testing-methodology skill activates*
+   - Select test type (unit/integration/e2e via decision tree)
+   - Generate edge cases (happy + sad + edge pattern)
    - Write test for new functionality
    - Run test - verify it fails
 
@@ -84,10 +90,12 @@ Automatic quality enforcement between phases:
 
 ## Git Workflow
 
-**Automatic Commits** (after successful implementation):
+**Automatic Commits** (after successful implementation + pre-commit gates):
 
-1. Check git status
-2. Stage relevant files only
+1. Run code-review skill (anti-patterns, complexity, naming) — must score 75+
+2. Run security-validation skill (secrets, injection, auth) — must score 80+
+3. Check git status
+4. Stage relevant files only
 3. Create descriptive commit message:
    ```
    [type]: [summary]
@@ -226,3 +234,13 @@ After every successful implementation:
 **Review knowledge-core.md**: Periodically to see accumulated patterns
 
 **Git commits locally only**: Review with `git show HEAD` before pushing
+
+## Opus 4.6 Enhancements
+
+The workflow system leverages several Opus 4.6 features:
+
+- **Adaptive thinking**: Agents automatically adjust reasoning depth based on task complexity
+- **Interleaved thinking**: Agents think between tool calls for better agentic decision-making
+- **Context compaction**: Long workflows run indefinitely without context window limits
+- **Parallel tool calling**: Agents fetch and process multiple sources simultaneously
+- **Agent Teams**: Native multi-agent orchestration with shared task lists (when available)

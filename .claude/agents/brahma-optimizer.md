@@ -24,9 +24,9 @@ Never optimize prematurely. Always measure first. Profile to find bottlenecks. O
 
 ## Anthropic Enhancements
 
-> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+> See **agent-shared.md** for adaptive thinking levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
 
-### Think Protocol for Optimization Decisions
+### Adaptive Thinking for Optimization Decisions
 **Before optimizing**: Measure baseline, profile to find actual bottleneck (don't guess), estimate expected improvement, weigh complexity/maintainability cost, assess regression risk, consider scaling vs optimizing.
 
 **Database optimization** (use `<think hard>`): Check query performance (EXPLAIN ANALYZE), connection pooling, indexing (missing/unused), data volume/growth, ORM issues (N+1), caching suitability, sharding needs.
@@ -549,6 +549,46 @@ Before declaring optimization complete:
 - [ ] Cost impact analyzed and acceptable
 - [ ] Monitoring alerts configured
 - [ ] Documentation updated (optimization patterns)
+
+## Context Awareness
+
+Your context window will be automatically compacted as it approaches its limit. Do not stop tasks early due to token budget concerns.
+
+## Agent-Specific Think Triggers
+
+Keywords map to effort levels (low/medium/high/max):
+- "think": Single bottleneck with clear profiling data
+- "think hard": Multiple bottlenecks competing for resources, optimization tradeoffs
+- "think harder": Fundamental architecture change needed (caching strategy, data model)
+- "ultrathink": Full system performance redesign, scaling strategy with cost implications
+
+## Anti-Stagnation
+
+- Performance baseline: 3 min max
+- Bottleneck identification: 5 min max
+- Per optimization: 5 min max
+- Total optimization cycle: 20 min max
+- If exceeded: Report optimizations applied so far with measured impact
+- Progress reporting every 60 seconds
+
+## Optimization Impact Score
+
+- Measurable performance improvement: 30 points
+- Before/after benchmarks provided: 25 points
+- No regressions introduced: 20 points
+- Scaling strategy defined: 15 points
+- Knowledge-core update suggested: 10 points
+
+Threshold: 75+ for acceptable optimization
+
+## Knowledge-Core Integration
+
+- At start: Check knowledge-core.md for established performance patterns and past optimizations
+- At end: Document optimization techniques, measured improvements, and scaling decisions
+
+## DeepWiki for Performance Tools
+
+When working with profiling tools, caching systems (Redis, Memcached), or load balancers, query DeepWiki for version-specific optimization patterns.
 
 ## Invocation Behavior
 

@@ -17,7 +17,7 @@ This repository contains the **Agentic Substrate** - the foundational layer for 
 **Tier 2 - Core Workflow**: docs-researcher, implementation-planner, brahma-analyzer, code-implementer, brahma-investigator
 **Tier 3 - Production**: brahma-deployer, brahma-monitor, brahma-optimizer
 
-### Skills (5 auto-invoked capabilities)
+### Skills (8 auto-invoked capabilities)
 @.claude/templates/skills-overview.md
 
 ### Workflows (Research → Plan → Implement + Advanced Patterns)
@@ -48,7 +48,18 @@ This repository contains the **Agentic Substrate** - the foundational layer for 
 
 ## Usage
 
-Automatic workflow: describe what you want and Claude sequences research → plan → implement. Manual control: invoke agents directly (e.g., "Use docs-researcher to..."). Extended thinking: include "think", "think hard", "think harder", or "ultrathink" in your request for progressively deeper reasoning.
+Automatic workflow: describe what you want and Claude sequences research → plan → implement. Manual control: invoke agents directly (e.g., "Use docs-researcher to..."). Adaptive thinking: include "think", "think hard", "think harder", or "ultrathink" in your request to set effort levels (low/medium/high/max). Opus 4.6 uses adaptive thinking with interleaved reasoning between tool calls automatically.
+
+## Opus 4.6 Optimizations
+
+- **Adaptive thinking** replaces extended thinking — effort levels (low/medium/high/max) replace budget_tokens
+- **Natural language prompts** — agents use conversational instructions instead of aggressive MANDATORY/CRITICAL directives
+- **Interleaved thinking** — agents reason between tool calls automatically
+- **Context compaction** — server-side compaction enables indefinite sessions
+- **Parallel tool calling** — agents execute independent tool calls simultaneously
+- **Agent Teams** — native multi-agent orchestration when available (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)
+- **Quality gates enforce** — validation hooks block (exit 1) on failure instead of warning
+- **Competing hypotheses** — brahma-investigator spawns parallel theories for complex debugging
 
 ## Integration with Global Settings
 

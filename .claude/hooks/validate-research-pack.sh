@@ -162,5 +162,5 @@ else
     echo "   Recommendation: Re-run @docs-researcher with focus on missing elements"
     echo "   Required score: 80/100 (current: $SCORE/100)"
     echo ""
-    exit 0  # Changed to warn instead of block - set to exit 1 to block
+    exit 1  # Block planning when quality gate fails
 fi

@@ -14,7 +14,7 @@ $ErrorActionPreference = "Stop"
 # GLOBAL VARIABLES
 # ============================================================================
 
-$VERSION = "4.1.0"
+$VERSION = "4.2.0"
 
 $script:CurlInstall = $false
 $script:TempClone = $false
@@ -826,7 +826,7 @@ function Display-Summary {
     Write-Host "Installation Summary:"
     Write-Host "  Location: $($script:ClaudeTarget)"
     Write-Host "  Version: $VERSION"
-    Write-Host "  Agents: 9 | Skills: 5 | Commands: 5"
+    Write-Host "  Agents: 9 | Skills: 8 | Commands: 5"
     Write-Host ""
 
     if ($script:BackupLocation) {

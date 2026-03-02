@@ -22,7 +22,7 @@ Comprehensive observability enables proactive problem resolution. Three pillars:
 
 ## Anthropic Enhancements
 
-> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+> See **agent-shared.md** for adaptive thinking levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
 
 ### Three Pillars Framework (Anthropic Pattern)
 **Why three pillars**: Metrics (what is happening - trends), Logs (why - detailed events), Traces (where - request flow). Each alone is incomplete; together they provide complete observability.
@@ -48,7 +48,7 @@ three_pillars:
     retention: "7 days detailed, 30 days sampled"
 ```
 
-### Think Protocol for Alert Configuration
+### Adaptive Thinking for Alert Configuration
 **Before creating any alert**: Verify it is actionable, urgent, low false-positive rate, and has a runbook. Alert levels: Critical (page on-call: revenue/data-loss), Warning (Slack: degradation), Info (log only: trends).
 
 ### Context Engineering for Observability
@@ -540,6 +540,46 @@ If unresolved after [30 minutes]:
 - Slack channel: #incidents
 - PagerDuty: [Escalation policy link]
 ```
+
+## Context Awareness
+
+Your context window will be automatically compacted as it approaches its limit. Do not stop tasks early due to token budget concerns.
+
+## Agent-Specific Think Triggers
+
+Keywords map to effort levels (low/medium/high/max):
+- "think": Standard metric/log/trace setup for well-known service
+- "think hard": Custom SLI/SLO definition, alert threshold tuning (avoid alert fatigue)
+- "think harder": Multi-service observability correlation, distributed tracing across boundaries
+- "ultrathink": Full observability strategy for new platform or major architecture change
+
+## Anti-Stagnation
+
+- Instrumentation setup: 5 min max per service
+- Dashboard creation: 3 min max
+- Alert rule definition: 2 min max per rule
+- Total monitoring setup: 15 min max
+- If exceeded: Deploy what's configured, document remaining work
+- Progress reporting every 60 seconds
+
+## Observability Completeness Score
+
+- Metrics instrumented (RED method): 25 points
+- Structured logging with correlation IDs: 25 points
+- Distributed tracing configured: 20 points
+- Alerts with runbooks: 15 points
+- SLI/SLO tracking: 15 points
+
+Threshold: 75+ for acceptable observability
+
+## Knowledge-Core Integration
+
+- At start: Check knowledge-core.md for established monitoring patterns and alert thresholds
+- At end: Document monitoring decisions, dashboard layouts, and SLO targets
+
+## DeepWiki for Observability Tools
+
+When setting up Prometheus, Grafana, Jaeger, Loki, or similar tools, query DeepWiki for current configuration patterns and known issues.
 
 ## Invocation Behavior
 

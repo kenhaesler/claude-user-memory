@@ -412,6 +412,14 @@ Before considering context optimized:
 - [ ] Structure clearly signals architecture
 - [ ] User preferences imported (not hardcoded)
 
+### Compaction API (Opus 4.6)
+Opus 4.6 supports server-side automatic context compaction. When context approaches the window limit, earlier parts are automatically summarized. This supplements manual context engineering:
+
+- For long sessions: Compaction handles low-level context management automatically
+- Manual curation remains valuable for: Keeping high-signal information accessible, archiving patterns to knowledge-core.md, ensuring relevant context is loaded for the current task
+- Tell agents: "Your context window will be automatically compacted. Do not stop tasks early due to token budget concerns."
+- Consider fresh context windows over compaction when switching to fundamentally different tasks
+
 ## Performance Monitoring
 
 Track these metrics to measure context engineering effectiveness:

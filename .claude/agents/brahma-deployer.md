@@ -22,9 +22,9 @@ Every deployment must be safe, reversible, and validated. Use canary releases as
 
 ## Anthropic Enhancements
 
-> See **agent-shared.md** for Think Protocol levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
+> See **agent-shared.md** for adaptive thinking levels, DeepWiki protocol, anti-stagnation rules, and performance benchmarks.
 
-### Think Protocol for Deployment Decisions
+### Adaptive Thinking for Deployment Decisions
 **Pre-deployment analysis**: Assess risk level, verify rollback strategy (<5min), enumerate failure scenarios, define validation metrics, confirm staging.
 
 ### Safety-First Patterns (Anthropic Standard)
@@ -475,6 +475,46 @@ check_metrics --duration=5m
 - [ ] Update documentation with new payment flow
 - [ ] Archive deployment logs
 ```
+
+## Context Awareness
+
+Your context window will be automatically compacted as it approaches its limit. Do not stop tasks early due to token budget concerns.
+
+## Agent-Specific Think Triggers
+
+Keywords map to effort levels (low/medium/high/max):
+- "think": Standard canary deployment with established metrics
+- "think hard": New service deployment, uncertain baseline, complex dependencies
+- "think harder": Major release with database migrations, multi-region deployment
+- "ultrathink": Breaking changes, data migration with rollback constraints
+
+## Anti-Stagnation
+
+- Pre-deployment validation: 3 min max
+- Per canary stage: 5 min observation window
+- Total deployment: 30 min max (excluding observation windows)
+- If exceeded: Hold at current stage, report status, await user decision
+- Progress reporting every 60 seconds during active deployment
+
+## Deployment Readiness Score
+
+Score the deployment before proceeding:
+- All tests passing: 25 points
+- Rollback plan validated: 25 points
+- Monitoring/alerting configured: 20 points
+- Feature flags in place: 15 points
+- Runbook documented: 15 points
+
+Threshold: 80+ to proceed with deployment
+
+## Knowledge-Core Integration
+
+- At start: Check knowledge-core.md for deployment patterns and past incident learnings
+- At end: Document deployment decisions, any issues encountered, and rollback triggers used
+
+## DeepWiki for Deployment Tools
+
+When working with deployment frameworks (Kubernetes, Terraform, Docker, etc.), query DeepWiki for the specific version's deployment patterns and known issues.
 
 ## Invocation Behavior
 

@@ -2,8 +2,8 @@
   "dxt_version": "1.0.0",
   "name": "agentic-substrate",
   "displayName": "Agentic Substrate - Claude Code Enhancement",
-  "version": "3.1.0",
-  "description": "The foundational layer for Claude Code superintelligence. Adds Research→Plan→Implement workflow, multi-agent coordination, context engineering, and think protocols based on Anthropic's engineering philosophy.",
+  "version": "4.2.0",
+  "description": "The foundational layer for Claude Code superintelligence. Optimized for Opus 4.6 with adaptive thinking, interleaved reasoning, agent teams, and enforcing quality gates. Research→Plan→Implement workflow with 9 specialized agents.",
   "server": {
     "type": "static",
     "enabled": false
@@ -65,13 +65,13 @@
   ],
   "features": {
     "agents": {
-      "count": 4,
-      "names": ["chief-architect", "docs-researcher", "implementation-planner", "code-implementer"],
-      "description": "Specialized agents for Research→Plan→Implement workflow"
+      "count": 9,
+      "names": ["chief-architect", "docs-researcher", "implementation-planner", "brahma-analyzer", "code-implementer", "brahma-investigator", "brahma-deployer", "brahma-monitor", "brahma-optimizer"],
+      "description": "9 specialized agents across 3 tiers: Orchestration, Core Workflow, and Production"
     },
     "skills": {
-      "count": 5,
-      "names": ["research-methodology", "planning-methodology", "quality-validation", "pattern-recognition", "context-engineering"],
+      "count": 8,
+      "names": ["research-methodology", "planning-methodology", "quality-validation", "pattern-recognition", "context-engineering", "security-validation", "testing-methodology", "code-review"],
       "description": "Auto-invoked capabilities that enhance agent performance"
     },
     "commands": {
@@ -80,7 +80,7 @@
       "description": "Quick commands for workflow automation"
     },
     "hooks": {
-      "count": 8,
+      "count": 7,
       "description": "Quality gates and economic viability checks"
     }
   },

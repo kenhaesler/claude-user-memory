@@ -13,7 +13,6 @@ Based on comprehensive research across 50+ authoritative sources (2024-2025), th
 
 ## Research Foundation
 
-**Source**: `SELF-ENHANCEMENT-BLUEPRINT.md` (comprehensive meta-research)
 **Agents Used**: 4 parallel researchers + 1 gap analyzer
 **Thinking Mode**: Ultrathink (5-10 min extended reasoning per domain)
 **Sources**: 50+ (official docs, research papers, benchmarks)

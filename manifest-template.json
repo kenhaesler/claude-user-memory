@@ -1,6 +1,6 @@
 {
   "manifest_version": "1.0.0",
-  "substrate_version": "3.1.0",
+  "substrate_version": "4.2.0",
   "managed_files": [
     "agents/brahma-analyzer.md",
     "agents/brahma-deployer.md",
@@ -16,6 +16,9 @@
     "skills/planning-methodology/skill.md",
     "skills/quality-validation/skill.md",
     "skills/research-methodology/skill.md",
+    "skills/security-validation/skill.md",
+    "skills/testing-methodology/skill.md",
+    "skills/code-review/skill.md",
     "commands/context.md",
     "commands/implement.md",
     "commands/plan.md",
@@ -38,7 +41,9 @@
     "templates/CLAUDE.md.user-level",
     "templates/skills-overview.md",
     "templates/workflows-overview.md",
-    "data/mcp-config-template.json"
+    "data/mcp-config-template.json",
+    "data/pattern-index.json",
+    "scripts/calculate-confidence.sh"
   ],
   "executable_files": [
     "hooks/auto-format.sh",
@@ -50,7 +55,8 @@
     "hooks/validate-research-pack.sh",
     "validators/api-matcher.sh",
     "validators/circuit-breaker.sh",
-    "metrics/tracker.sh"
+    "metrics/tracker.sh",
+    "scripts/calculate-confidence.sh"
   ],
   "protected_paths": [
     "data/",
@@ -86,14 +92,15 @@
     }
   },
   "metadata": {
-    "total_files": 37,
+    "total_files": 42,
     "agents": 9,
-    "skills": 5,
+    "skills": 8,
     "commands": 5,
     "hooks": 7,
     "validators": 2,
     "metrics": 1,
-    "templates": 6,
-    "data": 1
+    "templates": 7,
+    "data": 2,
+    "scripts": 1
   }
 }

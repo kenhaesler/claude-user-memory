@@ -29,12 +29,18 @@ if [[ "$TOOL_NAME" =~ ^(Read|Grep|WebFetch)$ ]]; then
   fi
 fi
 
-# Check for context rot based on conversation length
-# (This would need integration with Claude Code's message counting)
-# For now, this is a placeholder for when that API is available
-if [[ -f "/tmp/claude-message-count" ]]; then
-  MESSAGE_COUNT=$(cat /tmp/claude-message-count 2>/dev/null || echo "0")
-  if [[ $MESSAGE_COUNT -gt $CONTEXT_ROT_WARNING_THRESHOLD ]]; then
+# Check for context rot based on hook invocation count
+# Uses a file-based counter as a best-effort approximation of conversation length
+# (incremented each time this hook runs, roughly correlating with message count)
+COUNTER_FILE="$HOME/.claude/.context-message-count"
+if [[ ! -f "$COUNTER_FILE" ]]; then
+  echo "0" > "$COUNTER_FILE" 2>/dev/null || true
+fi
+MESSAGE_COUNT=$(cat "$COUNTER_FILE" 2>/dev/null || echo "0")
+MESSAGE_COUNT=$((MESSAGE_COUNT + 1))
+echo "$MESSAGE_COUNT" > "$COUNTER_FILE" 2>/dev/null || true
+
+if [[ $MESSAGE_COUNT -gt $CONTEXT_ROT_WARNING_THRESHOLD ]]; then
     echo ""
     echo "⚠️  Context Rot Alert"
     echo "   Conversation has exceeded $MESSAGE_COUNT messages"
@@ -48,7 +54,6 @@ if [[ -f "/tmp/claude-message-count" ]]; then
     echo "   Impact: Performance degrades by ~30% after 50 messages without curation"
     echo ""
   fi
-fi
 
 # Suggest context engineering for specific patterns
 case "$TOOL_NAME" in
