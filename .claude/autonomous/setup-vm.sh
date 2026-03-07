@@ -153,34 +153,35 @@ chmod 700 "$CONFIG_DIR"
 log_ok "Directories created and permissions set"
 
 # ============================================================================
-# STEP 5: SECURE API KEY STORAGE
+# STEP 5: AUTHENTICATION SETUP
 # ============================================================================
 
-log_info "Step 5: Setting up secure API key storage..."
+log_info "Step 5: Setting up authentication..."
 
-API_KEY_FILE="$CONFIG_DIR/api-key"
+echo ""
+echo "==========================================="
+echo "  Authentication Options"
+echo ""
+echo "  1. Claude CLI login (recommended)"
+echo "     Run: sudo -u $AGENT_USER claude login"
+echo ""
+echo "  2. API key (optional fallback)"
+echo "     Store at: $CONFIG_DIR/api-key"
+echo "==========================================="
+echo ""
 
-if [ ! -f "$API_KEY_FILE" ]; then
-    echo ""
-    echo "==========================================="
-    echo "  Enter your Anthropic API key"
-    echo "  (will be stored securely at $API_KEY_FILE)"
-    echo "  Press Ctrl+C to skip and configure later"
-    echo "==========================================="
-    echo ""
-    read -r -s -p "API Key: " api_key
-    echo ""
-
-    if [ -n "$api_key" ]; then
-        echo "$api_key" > "$API_KEY_FILE"
-        chown "$AGENT_USER:$AGENT_USER" "$API_KEY_FILE"
-        chmod 600 "$API_KEY_FILE"
-        log_ok "API key stored securely"
-    else
-        log_warn "No API key provided. Configure later at: $API_KEY_FILE"
-    fi
+# Check if CLI auth is already configured
+if sudo -u "$AGENT_USER" bash -c 'export PATH="$HOME/.local/bin:$PATH" && claude auth status' &>/dev/null 2>&1; then
+    log_ok "Claude CLI authentication already configured"
 else
-    log_info "API key file already exists"
+    log_warn "Claude CLI not yet authenticated"
+    log_info "Run after setup: sudo -u $AGENT_USER bash -c 'export PATH=\"\$HOME/.local/bin:\$PATH\" && claude login'"
+fi
+
+# Also support API key fallback
+API_KEY_FILE="$CONFIG_DIR/api-key"
+if [ -f "$API_KEY_FILE" ]; then
+    log_info "API key file also present (fallback)"
     chmod 600 "$API_KEY_FILE"
 fi
 

@@ -255,18 +255,28 @@ preflight() {
         exit 1
     fi
 
-    # Check API key
+    # Check authentication: CLI OAuth first, then API key fallback
     if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-        local key_file="/home/claude-agent/.config/claude-agent/api-key"
-        if [ -f "$key_file" ]; then
-            export ANTHROPIC_API_KEY
-            ANTHROPIC_API_KEY="$(cat "$key_file")"
-            log_info "API key loaded from secure storage"
+        # Try CLI's built-in auth (OAuth) first
+        if claude --version &>/dev/null && claude auth status &>/dev/null 2>&1; then
+            log_info "Using Claude CLI built-in authentication"
         else
-            log_error "ANTHROPIC_API_KEY not set and no secure key file found"
-            log_error "Set via environment or run setup-vm.sh to configure secure storage"
-            exit 1
+            # Fallback to API key file
+            local key_file="/home/claude-agent/.config/claude-agent/api-key"
+            if [ -f "$key_file" ]; then
+                export ANTHROPIC_API_KEY
+                ANTHROPIC_API_KEY="$(cat "$key_file")"
+                log_info "API key loaded from secure storage"
+            else
+                log_error "No authentication found. Either:"
+                log_error "  1. Run 'claude login' as claude-agent user (recommended)"
+                log_error "  2. Set ANTHROPIC_API_KEY environment variable"
+                log_error "  3. Store API key at: $key_file"
+                exit 1
+            fi
         fi
+    else
+        log_info "Using ANTHROPIC_API_KEY from environment"
     fi
 
     # Check circuit breaker
