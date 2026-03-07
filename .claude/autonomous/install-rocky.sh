@@ -182,7 +182,7 @@ if [ -f "$AGENT_CONFIG" ]; then
     echo "    Mode:     safe (--allowedTools whitelist)"
     echo "    Model:    claude-opus-4-6 (best quality, Sonnet fallback)"
     echo "    Schedule: every 4 hours"
-    echo "    Budget:   \$5.00 per task, \$10.00 global max"
+    echo "    Sessions: Up to 80% of session limit (50 sessions/24h default)"
     echo "    Tasks:    self-improve (enabled), run-tests (disabled), dependency-update (disabled)"
     echo ""
     echo -e "  ${YELLOW}Edit the config to customize:${NC}"

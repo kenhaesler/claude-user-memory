@@ -114,15 +114,16 @@ Set `"mode": "unsafe"` in config to use `--dangerously-skip-permissions`.
 
 ### Rate Limiting
 
-The runner tracks cumulative API spending across runs within a configurable session window
-and stops when a percentage threshold is reached.
+The runner tracks session count across runs within a configurable window and stops when a
+percentage threshold of the session limit is reached. This works with subscription-based
+billing where you have a fixed number of sessions per period.
 
 ```json
 {
   "rate_limit": {
     "enabled": true,
     "max_session_percent": 80,
-    "session_budget_usd": 25.00,
+    "session_limit": 50,
     "session_window_hours": 24,
     "pause_between_tasks_sec": 10,
     "wait_for_reset": true,
@@ -133,15 +134,15 @@ and stops when a percentage threshold is reached.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `max_session_percent` | `80` | Stop after using this % of `session_budget_usd` |
-| `session_budget_usd` | `$25.00` | Total budget per session window |
-| `session_window_hours` | `24` | Window length; usage counter resets after this |
+| `max_session_percent` | `80` | Stop after using this % of `session_limit` |
+| `session_limit` | `50` | Max sessions allowed per window (match your subscription plan) |
+| `session_window_hours` | `24` | Window length; session counter resets after this |
 | `pause_between_tasks_sec` | `10` | Delay between consecutive tasks |
 | `wait_for_reset` | `true` | If true, sleep until window resets. If false, exit and let systemd retry. |
-| `tracking_file` | `/var/log/claude-agent/usage-tracking.json` | Persists usage across runs |
+| `tracking_file` | `/var/log/claude-agent/usage-tracking.json` | Persists session count across runs |
 
-**Example**: With `session_budget_usd=25`, `max_session_percent=80`, the runner stops after
-spending $20.00 within the 24-hour window. If `wait_for_reset=true`, it sleeps until the
+**Example**: With `session_limit=50`, `max_session_percent=80`, the runner stops after
+using 40 sessions within the 24-hour window. If `wait_for_reset=true`, it sleeps until the
 window expires, then resumes. If `false`, it exits and the systemd timer retries next cycle.
 
 ## Configuration Reference
@@ -160,9 +161,9 @@ See `autonomous-config.json` for all options with inline documentation (`_descri
 | `safety.branch_strategy` | `autonomous/run-{timestamp}` | Git branch for changes |
 | `model.primary` | `claude-opus-4-6` | Model for autonomous runs |
 | `schedule.default_interval` | `4h` | Run frequency |
-| `rate_limit.enabled` | `true` | Enable session budget tracking |
-| `rate_limit.max_session_percent` | `80` | Use up to this % of session budget |
-| `rate_limit.session_budget_usd` | `$25.00` | Total budget per session window |
+| `rate_limit.enabled` | `true` | Enable session count tracking |
+| `rate_limit.max_session_percent` | `80` | Use up to this % of session limit |
+| `rate_limit.session_limit` | `50` | Max sessions per window (match your plan) |
 | `rate_limit.session_window_hours` | `24` | Session window length (hours) |
 | `rate_limit.wait_for_reset` | `true` | Sleep until reset vs exit immediately |
 
