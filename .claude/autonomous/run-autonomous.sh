@@ -287,14 +287,15 @@ if os.path.exists(output_file):
                 usage = data.get('usage', {})
                 input_tokens = usage.get('input_tokens', 0)
                 output_tokens = usage.get('output_tokens', 0)
-                # Rough Sonnet pricing: ~$3/MTok input, ~$15/MTok output
-                cost = (input_tokens * 3 + output_tokens * 15) / 1_000_000
+                # Rough Opus pricing: ~$15/MTok input, ~$75/MTok output
+                # (conservative estimate; adjust if using Sonnet fallback)
+                cost = (input_tokens * 15 + output_tokens * 75) / 1_000_000
     except (json.JSONDecodeError, KeyError, TypeError):
         pass
 
 # If we couldn't determine cost, use a conservative estimate
 if cost == 0:
-    cost = 0.50  # default estimate per task run
+    cost = 2.00  # conservative default estimate per task run (Opus 4.6)
 
 print(round(cost, 4))
 " 2>/dev/null
@@ -427,7 +428,7 @@ run_task() {
 
     # Get model
     local model fallback_model
-    model=$(json_get "$CONFIG_FILE" "model.primary" 2>/dev/null || echo "claude-sonnet-4-6")
+    model=$(json_get "$CONFIG_FILE" "model.primary" 2>/dev/null || echo "claude-opus-4-6")
     fallback_model=$(json_get "$CONFIG_FILE" "model.fallback" 2>/dev/null || echo "claude-sonnet-4-6")
 
     # Get working directory

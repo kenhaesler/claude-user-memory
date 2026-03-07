@@ -99,9 +99,9 @@
   },
 
   "model": {
-    "primary": "claude-sonnet-4-6",
+    "primary": "claude-opus-4-6",
     "fallback": "claude-sonnet-4-6",
-    "_description": "Use Sonnet for cost efficiency in autonomous runs. Override with Opus for complex tasks."
+    "_description": "Opus 4.6 for best quality. Sonnet 4.6 as fallback if Opus is overloaded."
   },
 
   "logging": {

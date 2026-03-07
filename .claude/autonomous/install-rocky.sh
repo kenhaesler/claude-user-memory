@@ -180,7 +180,7 @@ if [ -f "$AGENT_CONFIG" ]; then
     echo ""
     echo "  Default settings:"
     echo "    Mode:     safe (--allowedTools whitelist)"
-    echo "    Model:    claude-sonnet-4-6 (cost-efficient)"
+    echo "    Model:    claude-opus-4-6 (best quality, Sonnet fallback)"
     echo "    Schedule: every 4 hours"
     echo "    Budget:   \$5.00 per task, \$10.00 global max"
     echo "    Tasks:    self-improve (enabled), run-tests (disabled), dependency-update (disabled)"

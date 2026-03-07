@@ -158,7 +158,7 @@ See `autonomous-config.json` for all options with inline documentation (`_descri
 | `safety.auto_commit` | `true` | Auto-commit changes after each task |
 | `safety.auto_push` | `false` | Auto-push commits (disabled by default) |
 | `safety.branch_strategy` | `autonomous/run-{timestamp}` | Git branch for changes |
-| `model.primary` | `claude-sonnet-4-6` | Model for autonomous runs |
+| `model.primary` | `claude-opus-4-6` | Model for autonomous runs |
 | `schedule.default_interval` | `4h` | Run frequency |
 | `rate_limit.enabled` | `true` | Enable session budget tracking |
 | `rate_limit.max_session_percent` | `80` | Use up to this % of session budget |
