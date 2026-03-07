@@ -82,6 +82,22 @@
     "_branch_strategy_options": ["main", "autonomous/run-{timestamp}", "autonomous/latest"]
   },
 
+  "rate_limit": {
+    "enabled": true,
+    "max_session_percent": 80,
+    "_max_session_percent_description": "Use up to this % of the session budget before pausing (1-100)",
+    "session_budget_usd": 25.00,
+    "_session_budget_description": "Total budget per session window. Set to your API plan's limit or desired cap.",
+    "session_window_hours": 24,
+    "_session_window_description": "Length of one session window in hours. Usage resets after this period.",
+    "pause_between_tasks_sec": 10,
+    "_pause_between_tasks_description": "Seconds to wait between consecutive tasks (prevents burst requests)",
+    "wait_for_reset": true,
+    "_wait_for_reset_description": "If true, sleep until the session window resets. If false, exit and let systemd timer retry later.",
+    "tracking_file": "/var/log/claude-agent/usage-tracking.json",
+    "_tracking_file_description": "File to track cumulative usage across runs within a session window"
+  },
+
   "model": {
     "primary": "claude-sonnet-4-6",
     "fallback": "claude-sonnet-4-6",

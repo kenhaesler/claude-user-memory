@@ -100,16 +100,49 @@ Set `"mode": "unsafe"` in config to use `--dangerously-skip-permissions`.
 
 ### Safety Layers
 
-1. **Budget limits**: `--max-turns` and `--max-budget-usd` cap API usage
-2. **Circuit breaker**: 3 consecutive failures stops all runs until manual reset
-3. **Git clean check**: Refuses to run if workspace has uncommitted changes
-4. **Branch strategy**: Creates isolated branches for autonomous changes
-5. **Auto-push disabled**: Changes stay local until human reviews
-6. **Dedicated user**: `claude-agent` has minimal OS permissions
-7. **SELinux**: Type enforcement restricts process capabilities
-8. **Firewall**: Only HTTPS outbound allowed for agent user
-9. **Resource limits**: systemd caps CPU (80%) and memory (2GB)
-10. **Log rotation**: Prevents disk exhaustion
+1. **Rate limiting**: Use only X% of session budget, then wait for reset (configurable)
+2. **Budget limits**: `--max-turns` and `--max-budget-usd` cap API usage per task
+3. **Circuit breaker**: 3 consecutive failures stops all runs until manual reset
+4. **Git clean check**: Refuses to run if workspace has uncommitted changes
+5. **Branch strategy**: Creates isolated branches for autonomous changes
+6. **Auto-push disabled**: Changes stay local until human reviews
+7. **Dedicated user**: `claude-agent` has minimal OS permissions
+8. **SELinux**: Type enforcement restricts process capabilities
+9. **Firewall**: Only HTTPS outbound allowed for agent user
+10. **Resource limits**: systemd caps CPU (80%) and memory (2GB)
+11. **Log rotation**: Prevents disk exhaustion
+
+### Rate Limiting
+
+The runner tracks cumulative API spending across runs within a configurable session window
+and stops when a percentage threshold is reached.
+
+```json
+{
+  "rate_limit": {
+    "enabled": true,
+    "max_session_percent": 80,
+    "session_budget_usd": 25.00,
+    "session_window_hours": 24,
+    "pause_between_tasks_sec": 10,
+    "wait_for_reset": true,
+    "tracking_file": "/var/log/claude-agent/usage-tracking.json"
+  }
+}
+```
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `max_session_percent` | `80` | Stop after using this % of `session_budget_usd` |
+| `session_budget_usd` | `$25.00` | Total budget per session window |
+| `session_window_hours` | `24` | Window length; usage counter resets after this |
+| `pause_between_tasks_sec` | `10` | Delay between consecutive tasks |
+| `wait_for_reset` | `true` | If true, sleep until window resets. If false, exit and let systemd retry. |
+| `tracking_file` | `/var/log/claude-agent/usage-tracking.json` | Persists usage across runs |
+
+**Example**: With `session_budget_usd=25`, `max_session_percent=80`, the runner stops after
+spending $20.00 within the 24-hour window. If `wait_for_reset=true`, it sleeps until the
+window expires, then resumes. If `false`, it exits and the systemd timer retries next cycle.
 
 ## Configuration Reference
 
@@ -127,6 +160,11 @@ See `autonomous-config.json` for all options with inline documentation (`_descri
 | `safety.branch_strategy` | `autonomous/run-{timestamp}` | Git branch for changes |
 | `model.primary` | `claude-sonnet-4-6` | Model for autonomous runs |
 | `schedule.default_interval` | `4h` | Run frequency |
+| `rate_limit.enabled` | `true` | Enable session budget tracking |
+| `rate_limit.max_session_percent` | `80` | Use up to this % of session budget |
+| `rate_limit.session_budget_usd` | `$25.00` | Total budget per session window |
+| `rate_limit.session_window_hours` | `24` | Session window length (hours) |
+| `rate_limit.wait_for_reset` | `true` | Sleep until reset vs exit immediately |
 
 ## Manual Operation
 

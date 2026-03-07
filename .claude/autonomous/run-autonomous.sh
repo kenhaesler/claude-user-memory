@@ -97,6 +97,210 @@ EOF
 }
 
 # ============================================================================
+# RATE LIMIT TRACKING
+# ============================================================================
+
+RATE_LIMIT_ENABLED=false
+RATE_TRACKING_FILE=""
+SESSION_BUDGET=0
+SESSION_PERCENT=80
+SESSION_WINDOW_HOURS=24
+WAIT_FOR_RESET=true
+PAUSE_BETWEEN_TASKS=10
+
+load_rate_config() {
+    RATE_LIMIT_ENABLED=$(json_get "$CONFIG_FILE" "rate_limit.enabled" 2>/dev/null || echo "false")
+    if [ "$RATE_LIMIT_ENABLED" != "true" ]; then
+        return 0
+    fi
+
+    SESSION_BUDGET=$(json_get "$CONFIG_FILE" "rate_limit.session_budget_usd" 2>/dev/null || echo "25.00")
+    SESSION_PERCENT=$(json_get "$CONFIG_FILE" "rate_limit.max_session_percent" 2>/dev/null || echo "80")
+    SESSION_WINDOW_HOURS=$(json_get "$CONFIG_FILE" "rate_limit.session_window_hours" 2>/dev/null || echo "24")
+    WAIT_FOR_RESET=$(json_get "$CONFIG_FILE" "rate_limit.wait_for_reset" 2>/dev/null || echo "true")
+    PAUSE_BETWEEN_TASKS=$(json_get "$CONFIG_FILE" "rate_limit.pause_between_tasks_sec" 2>/dev/null || echo "10")
+    RATE_TRACKING_FILE=$(json_get "$CONFIG_FILE" "rate_limit.tracking_file" 2>/dev/null || echo "/var/log/claude-agent/usage-tracking.json")
+
+    # Ensure tracking dir exists
+    mkdir -p "$(dirname "$RATE_TRACKING_FILE")" 2>/dev/null || true
+
+    log_info "Rate limiting enabled: ${SESSION_PERCENT}% of \$${SESSION_BUDGET} per ${SESSION_WINDOW_HOURS}h window"
+}
+
+# Get or initialize the usage tracking state
+get_usage_state() {
+    python3 -c "
+import json, time, os
+
+tracking_file = '$RATE_TRACKING_FILE'
+window_hours = $SESSION_WINDOW_HOURS
+now = time.time()
+
+# Default state
+state = {
+    'window_start': now,
+    'total_spent_usd': 0.0,
+    'task_count': 0,
+    'last_run': now
+}
+
+if os.path.exists(tracking_file):
+    try:
+        with open(tracking_file) as f:
+            state = json.load(f)
+        # Check if window has expired — reset if so
+        elapsed = now - state.get('window_start', now)
+        window_sec = window_hours * 3600
+        if elapsed >= window_sec:
+            state = {
+                'window_start': now,
+                'total_spent_usd': 0.0,
+                'task_count': 0,
+                'last_run': now
+            }
+    except (json.JSONDecodeError, KeyError):
+        pass
+
+print(json.dumps(state))
+" 2>/dev/null
+}
+
+# Record spending from a completed task
+record_spending() {
+    local spent="$1"
+    python3 -c "
+import json, time, os
+
+tracking_file = '$RATE_TRACKING_FILE'
+spent = float('$spent')
+now = time.time()
+
+state = {'window_start': now, 'total_spent_usd': 0.0, 'task_count': 0, 'last_run': now}
+if os.path.exists(tracking_file):
+    try:
+        with open(tracking_file) as f:
+            state = json.load(f)
+    except (json.JSONDecodeError, KeyError):
+        pass
+
+state['total_spent_usd'] = round(state.get('total_spent_usd', 0) + spent, 4)
+state['task_count'] = state.get('task_count', 0) + 1
+state['last_run'] = now
+
+with open(tracking_file, 'w') as f:
+    json.dump(state, f, indent=2)
+" 2>/dev/null
+}
+
+# Check if we can run another task within the rate limit
+# Returns: 0 = OK to proceed, 1 = at limit (should wait/stop)
+check_rate_limit() {
+    if [ "$RATE_LIMIT_ENABLED" != "true" ]; then
+        return 0
+    fi
+
+    local result
+    result=$(python3 -c "
+import json, time, os
+
+tracking_file = '$RATE_TRACKING_FILE'
+session_budget = float('$SESSION_BUDGET')
+session_percent = float('$SESSION_PERCENT')
+window_hours = float('$SESSION_WINDOW_HOURS')
+now = time.time()
+
+threshold = session_budget * (session_percent / 100.0)
+
+state = {'window_start': now, 'total_spent_usd': 0.0, 'task_count': 0}
+if os.path.exists(tracking_file):
+    try:
+        with open(tracking_file) as f:
+            state = json.load(f)
+    except (json.JSONDecodeError, KeyError):
+        pass
+
+# Check if window expired (auto-reset)
+elapsed = now - state.get('window_start', now)
+window_sec = window_hours * 3600
+if elapsed >= window_sec:
+    # Window expired, reset
+    print('OK|0.00|%.2f|0' % threshold)
+else:
+    spent = state.get('total_spent_usd', 0)
+    remaining_sec = window_sec - elapsed
+    remaining_min = int(remaining_sec / 60)
+    if spent >= threshold:
+        print('LIMIT|%.2f|%.2f|%d' % (spent, threshold, remaining_min))
+    else:
+        print('OK|%.2f|%.2f|%d' % (spent, threshold, remaining_min))
+" 2>/dev/null)
+
+    local status spent threshold remaining
+    IFS='|' read -r status spent threshold remaining <<< "$result"
+
+    if [ "$status" = "LIMIT" ]; then
+        log_warn "Rate limit reached: \$$spent spent of \$$threshold threshold (${SESSION_PERCENT}% of \$$SESSION_BUDGET)"
+        log_warn "Session window resets in ${remaining} minutes"
+
+        if [ "$WAIT_FOR_RESET" = "true" ]; then
+            local wait_sec=$((remaining * 60))
+            if [ "$wait_sec" -gt 0 ] && [ "$wait_sec" -le 86400 ]; then
+                log_info "Waiting ${remaining} minutes for session window to reset..."
+                send_notification "rate_limit" "Rate limit reached (\$$spent/\$$threshold). Waiting ${remaining}m for reset."
+                sleep "$wait_sec"
+                # Reset tracking after waiting
+                record_spending 0  # triggers window reset check on next call
+                log_ok "Session window reset. Resuming tasks."
+                return 0
+            else
+                log_warn "Wait time too long or invalid (${remaining}m). Exiting instead."
+                return 1
+            fi
+        else
+            log_info "wait_for_reset=false. Exiting. Systemd timer will retry later."
+            return 1
+        fi
+    else
+        log_info "Rate limit OK: \$$spent spent of \$$threshold threshold"
+        return 0
+    fi
+}
+
+# Extract cost from claude JSON output (best-effort)
+extract_task_cost() {
+    local output_file="$1"
+    python3 -c "
+import json, os
+
+cost = 0.0
+output_file = '$output_file'
+
+if os.path.exists(output_file):
+    try:
+        with open(output_file) as f:
+            data = json.load(f)
+        # Claude JSON output may include cost_usd or usage info
+        if isinstance(data, dict):
+            cost = data.get('cost_usd', 0) or data.get('total_cost_usd', 0) or 0
+            # Fallback: estimate from token usage if cost not directly available
+            if cost == 0:
+                usage = data.get('usage', {})
+                input_tokens = usage.get('input_tokens', 0)
+                output_tokens = usage.get('output_tokens', 0)
+                # Rough Sonnet pricing: ~$3/MTok input, ~$15/MTok output
+                cost = (input_tokens * 3 + output_tokens * 15) / 1_000_000
+    except (json.JSONDecodeError, KeyError, TypeError):
+        pass
+
+# If we couldn't determine cost, use a conservative estimate
+if cost == 0:
+    cost = 0.50  # default estimate per task run
+
+print(round(cost, 4))
+" 2>/dev/null
+}
+
+# ============================================================================
 # PREFLIGHT CHECKS
 # ============================================================================
 
@@ -151,6 +355,9 @@ preflight() {
         mkdir -p "$LOG_DIR"
         log_warn "Cannot write to configured log dir, using $LOG_DIR"
     }
+
+    # Load rate limit config
+    load_rate_config
 
     log_ok "Preflight checks passed"
 }
@@ -441,6 +648,13 @@ main() {
             continue
         fi
 
+        # Check rate limit before running task
+        if ! check_rate_limit; then
+            log_warn "Stopping task execution due to rate limit"
+            send_notification "rate_limit" "Rate limit reached. Stopping before task $id in run $RUN_ID"
+            break
+        fi
+
         if ! run_task "$i"; then
             overall_status=1
             send_notification "failure" "Task $id failed in run $RUN_ID"
@@ -455,6 +669,20 @@ main() {
             fi
         else
             send_notification "success" "Task $id completed in run $RUN_ID"
+        fi
+
+        # Record cost from the task output and pause between tasks
+        if [ "$RATE_LIMIT_ENABLED" = "true" ]; then
+            local output_file="$LOG_DIR/run-${RUN_ID}-${id}.json"
+            local task_cost
+            task_cost=$(extract_task_cost "$output_file")
+            record_spending "$task_cost"
+            log_info "Task cost: \$$task_cost recorded"
+
+            if [ "$PAUSE_BETWEEN_TASKS" -gt 0 ] 2>/dev/null; then
+                log_info "Pausing ${PAUSE_BETWEEN_TASKS}s between tasks..."
+                sleep "$PAUSE_BETWEEN_TASKS"
+            fi
         fi
     done
 
