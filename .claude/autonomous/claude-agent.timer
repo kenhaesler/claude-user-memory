@@ -1,0 +1,19 @@
+[Unit]
+Description=Claude Code Autonomous Agent Timer
+Documentation=https://github.com/VAMFI/claude-user-memory
+
+[Timer]
+# Run every 4 hours (configurable)
+OnCalendar=*-*-* 00/4:00:00
+
+# Catch up after downtime
+Persistent=true
+
+# Randomize start within 5 minutes to avoid API thundering herd
+RandomizedDelaySec=300
+
+# Don't run within 1 minute of boot (let system stabilize)
+OnBootSec=60
+
+[Install]
+WantedBy=timers.target

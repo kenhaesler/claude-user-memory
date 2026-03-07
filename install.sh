@@ -10,6 +10,7 @@ VERSION="4.2.0"
 
 DRY_RUN=false
 FORCE=false
+WITH_AUTONOMOUS=false
 CURL_INSTALL=false
 TEMP_CLONE=false
 SCRIPT_DIR=""
@@ -257,6 +258,7 @@ parse_flags() {
         case $1 in
             --dry-run) DRY_RUN=true; shift ;;
             --force) FORCE=true; shift ;;
+            --with-autonomous) WITH_AUTONOMOUS=true; shift ;;
             --help)
                 echo "Agentic Substrate Installer v$VERSION"
                 echo ""
@@ -264,8 +266,9 @@ parse_flags() {
                 echo ""
                 echo "Options:"
                 echo "  --dry-run    Show what would be installed without installing"
-                echo "  --force      Force reinstall even if already installed"
-                echo "  --help       Show this help message"
+                echo "  --force              Force reinstall even if already installed"
+                echo "  --with-autonomous    Install autonomous mode files (VM headless operation)"
+                echo "  --help               Show this help message"
                 echo ""
                 exit 0
                 ;;
@@ -440,7 +443,7 @@ install_files() {
     log_info "Installing Agentic Substrate components..."
 
     # Create directory structure
-    mkdir -p "$CLAUDE_TARGET"/{agents,skills,commands,hooks,validators,metrics,templates,data} 2>/dev/null || {
+    mkdir -p "$CLAUDE_TARGET"/{agents,skills,commands,hooks,validators,metrics,templates,data,autonomous/selinux} 2>/dev/null || {
         log_error "Failed to create installation directories"
         return 1
     }
@@ -608,6 +611,58 @@ install_mcp_config() {
     else
         log_warning "Failed to install MCP config"
     fi
+}
+
+# Install autonomous mode files (optional)
+install_autonomous() {
+    if [ "$WITH_AUTONOMOUS" != true ]; then
+        return 0
+    fi
+
+    if [ "$DRY_RUN" = true ]; then
+        log_info "[DRY RUN] Would install autonomous mode files"
+        return 0
+    fi
+
+    log_info "Installing autonomous mode files..."
+
+    local auto_source="$CLAUDE_SOURCE/autonomous"
+    local auto_target="$CLAUDE_TARGET/autonomous"
+
+    if [ ! -d "$auto_source" ]; then
+        log_warning "Autonomous mode source files not found (skipping)"
+        return 0
+    fi
+
+    mkdir -p "$auto_target/selinux" 2>/dev/null || true
+
+    # Install files (config uses install-if-missing pattern)
+    for f in setup-vm.sh run-autonomous.sh claude-agent.service claude-agent.timer CLAUDE-autonomous.md README.md; do
+        if [ -f "$auto_source/$f" ]; then
+            cp "$auto_source/$f" "$auto_target/$f" 2>/dev/null || true
+        fi
+    done
+
+    # SELinux policy
+    if [ -f "$auto_source/selinux/claude-agent.te" ]; then
+        cp "$auto_source/selinux/claude-agent.te" "$auto_target/selinux/" 2>/dev/null || true
+    fi
+
+    # Config: install-if-missing
+    if [ ! -f "$auto_target/autonomous-config.json" ]; then
+        if [ -f "$auto_source/autonomous-config.json" ]; then
+            cp "$auto_source/autonomous-config.json" "$auto_target/" 2>/dev/null || true
+        fi
+    else
+        log_info "Existing autonomous config found - preserving user configuration"
+    fi
+
+    # Set executable permissions
+    chmod +x "$auto_target/setup-vm.sh" "$auto_target/run-autonomous.sh" 2>/dev/null || true
+
+    log_success "Autonomous mode files installed"
+    log_info "  Setup VM: sudo $auto_target/setup-vm.sh"
+    log_info "  Docs: $auto_target/README.md"
 }
 
 # Install MCP servers
@@ -812,6 +867,14 @@ display_summary() {
         echo ""
     fi
 
+    if [ "$WITH_AUTONOMOUS" = true ]; then
+        echo "Autonomous Mode:"
+        echo "  Files: $CLAUDE_TARGET/autonomous/"
+        echo "  Setup: sudo $CLAUDE_TARGET/autonomous/setup-vm.sh"
+        echo "  Docs:  $CLAUDE_TARGET/autonomous/README.md"
+        echo ""
+    fi
+
     echo "Quick Start:"
     echo "  1. Start Claude Code CLI"
     echo "  2. Try: /workflow Add feature X"
@@ -867,6 +930,7 @@ main() {
     smart_merge_claude_md
     install_mcp_config
     install_mcp_servers
+    install_autonomous
     generate_manifest
     write_version
     generate_rollback

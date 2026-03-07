@@ -5,6 +5,7 @@
 param(
     [switch]$DryRun,
     [switch]$Force,
+    [switch]$WithAutonomous,
     [switch]$Help
 )
 
@@ -280,9 +281,10 @@ function Show-Help {
     Write-Host "Usage: .\install.ps1 [OPTIONS]"
     Write-Host ""
     Write-Host "Options:"
-    Write-Host "  -DryRun     Show what would be installed without installing"
-    Write-Host "  -Force      Force reinstall even if already installed"
-    Write-Host "  -Help       Show this help message"
+    Write-Host "  -DryRun          Show what would be installed without installing"
+    Write-Host "  -Force           Force reinstall even if already installed"
+    Write-Host "  -WithAutonomous  Install autonomous mode files (VM headless operation)"
+    Write-Host "  -Help            Show this help message"
     Write-Host ""
     exit 0
 }
@@ -439,7 +441,7 @@ function Install-Files {
     Log-Info "Installing Agentic Substrate components..."
 
     # Create directory structure
-    $dirs = @("agents", "skills", "commands", "hooks", "validators", "metrics", "templates", "data")
+    $dirs = @("agents", "skills", "commands", "hooks", "validators", "metrics", "templates", "data", "autonomous", "autonomous/selinux")
     foreach ($dir in $dirs) {
         $dirPath = Join-Path $script:ClaudeTarget $dir
         if (-not (Test-Path $dirPath)) {
@@ -633,6 +635,68 @@ function Install-McpConfig {
     } catch {
         Log-Warning "Failed to install MCP config"
     }
+}
+
+# Install autonomous mode files (optional)
+function Install-Autonomous {
+    if (-not $WithAutonomous) {
+        return
+    }
+
+    if ($DryRun) {
+        Log-Info "[DRY RUN] Would install autonomous mode files"
+        return
+    }
+
+    Log-Info "Installing autonomous mode files..."
+
+    $autoSource = Join-Path $script:ClaudeSource "autonomous"
+    $autoTarget = Join-Path $script:ClaudeTarget "autonomous"
+
+    if (-not (Test-Path $autoSource)) {
+        Log-Warning "Autonomous mode source files not found (skipping)"
+        return
+    }
+
+    # Create directories
+    @("autonomous", "autonomous/selinux") | ForEach-Object {
+        $dir = Join-Path $script:ClaudeTarget $_
+        if (-not (Test-Path $dir)) {
+            New-Item -ItemType Directory -Path $dir -Force | Out-Null
+        }
+    }
+
+    # Copy files
+    $filesToCopy = @(
+        "setup-vm.sh", "run-autonomous.sh", "claude-agent.service",
+        "claude-agent.timer", "CLAUDE-autonomous.md", "README.md"
+    )
+    foreach ($f in $filesToCopy) {
+        $src = Join-Path $autoSource $f
+        if (Test-Path $src) {
+            Copy-Item -Force $src (Join-Path $autoTarget $f)
+        }
+    }
+
+    # SELinux policy
+    $seSrc = Join-Path $autoSource "selinux/claude-agent.te"
+    if (Test-Path $seSrc) {
+        Copy-Item -Force $seSrc (Join-Path $autoTarget "selinux/claude-agent.te")
+    }
+
+    # Config: install-if-missing
+    $configTarget = Join-Path $autoTarget "autonomous-config.json"
+    if (-not (Test-Path $configTarget)) {
+        $configSrc = Join-Path $autoSource "autonomous-config.json"
+        if (Test-Path $configSrc) {
+            Copy-Item -Force $configSrc $configTarget
+        }
+    } else {
+        Log-Info "Existing autonomous config found - preserving user configuration"
+    }
+
+    Log-Success "Autonomous mode files installed"
+    Log-Info "  Docs: $(Join-Path $autoTarget 'README.md')"
 }
 
 # Install MCP servers
@@ -836,6 +900,14 @@ function Display-Summary {
         Write-Host ""
     }
 
+    if ($WithAutonomous) {
+        Write-Host "Autonomous Mode:"
+        Write-Host "  Files: $(Join-Path $script:ClaudeTarget 'autonomous')"
+        Write-Host "  Setup: sudo $(Join-Path $script:ClaudeTarget 'autonomous/setup-vm.sh')"
+        Write-Host "  Docs:  $(Join-Path $script:ClaudeTarget 'autonomous/README.md')"
+        Write-Host ""
+    }
+
     Write-Host "Quick Start:"
     Write-Host "  1. Start Claude Code CLI"
     Write-Host "  2. Try: /workflow Add feature X"
@@ -897,6 +969,7 @@ function Main {
         SmartMerge-ClaudeMd
         Install-McpConfig
         Install-McpServers
+        Install-Autonomous
         Generate-Manifest
         Write-VersionFile
         Generate-Rollback

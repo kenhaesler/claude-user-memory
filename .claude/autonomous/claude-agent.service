@@ -1,0 +1,46 @@
+[Unit]
+Description=Claude Code Autonomous Agent
+Documentation=https://github.com/VAMFI/claude-user-memory
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=claude-agent
+Group=claude-agent
+WorkingDirectory=/home/claude-agent/workspace
+
+# Load API key from secure storage
+Environment=HOME=/home/claude-agent
+EnvironmentFile=-/home/claude-agent/.config/claude-agent/environment
+
+# Execute the task runner
+ExecStart=/home/claude-agent/.claude/autonomous/run-autonomous.sh
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/claude-agent/workspace /var/log/claude-agent /home/claude-agent/.claude
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=no
+RestrictRealtime=yes
+
+# Resource limits
+MemoryMax=2G
+CPUQuota=80%
+TimeoutStartSec=1800
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=claude-agent
+
+[Install]
+WantedBy=multi-user.target

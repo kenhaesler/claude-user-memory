@@ -43,7 +43,16 @@
     "templates/workflows-overview.md",
     "data/mcp-config-template.json",
     "data/pattern-index.json",
-    "scripts/calculate-confidence.sh"
+    "scripts/calculate-confidence.sh",
+    "autonomous/setup-vm.sh",
+    "autonomous/run-autonomous.sh",
+    "autonomous/autonomous-config.json",
+    "autonomous/claude-agent.service",
+    "autonomous/claude-agent.timer",
+    "autonomous/CLAUDE-autonomous.md",
+    "autonomous/selinux/claude-agent.te",
+    "autonomous/README.md",
+    "autonomous/install-rocky.sh"
   ],
   "executable_files": [
     "hooks/auto-format.sh",
@@ -56,7 +65,10 @@
     "validators/api-matcher.sh",
     "validators/circuit-breaker.sh",
     "metrics/tracker.sh",
-    "scripts/calculate-confidence.sh"
+    "scripts/calculate-confidence.sh",
+    "autonomous/setup-vm.sh",
+    "autonomous/run-autonomous.sh",
+    "autonomous/install-rocky.sh"
   ],
   "protected_paths": [
     "data/",
@@ -89,10 +101,14 @@
       "action": "install-if-missing",
       "source": "data/mcp-config-template.json",
       "reason": "MCP server configuration - preserve user's existing config"
+    },
+    "autonomous/autonomous-config.json": {
+      "action": "install-if-missing",
+      "reason": "User-customizable autonomous configuration - preserve user changes"
     }
   },
   "metadata": {
-    "total_files": 42,
+    "total_files": 51,
     "agents": 9,
     "skills": 8,
     "commands": 5,
@@ -101,6 +117,7 @@
     "metrics": 1,
     "templates": 7,
     "data": 2,
-    "scripts": 1
+    "scripts": 1,
+    "autonomous": 9
   }
 }
