@@ -1,0 +1,41 @@
+{
+  "projects": [
+    {
+      "repo": "kenhaesler/vsphere-ai-dashboard",
+      "priority": "high",
+      "mode": "full"
+    }
+  ],
+
+  "_mode_options": {
+    "full": "Find issues, implement, test, commit (default)",
+    "analyze": "Analyze codebase, create/refine GitHub issues, but never write code"
+  },
+
+  "schedule": "1h",
+
+  "models": {
+    "employee": "claude-opus-4-6",
+    "manager": "claude-sonnet-4-6"
+  },
+
+  "limits": {
+    "max_employee_turns": 200,
+    "max_employee_budget_usd": 25.00,
+    "max_manager_turns": 30,
+    "max_manager_budget_usd": 3.00,
+    "session_limit_24h": 50,
+    "max_session_percent": 80
+  },
+
+  "notifications": {
+    "enabled": true,
+    "method": "file",
+    "notification_file": "/var/log/claude-agent/notifications.log"
+  },
+
+  "logging": {
+    "log_dir": "/var/log/claude-agent",
+    "digest_dir": "/var/log/claude-agent/digests"
+  }
+}

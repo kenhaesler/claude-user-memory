@@ -3,8 +3,8 @@ Description=Claude Code Autonomous Agent Timer
 Documentation=https://github.com/VAMFI/claude-user-memory
 
 [Timer]
-# Run every 4 hours (configurable)
-OnCalendar=*-*-* 00/4:00:00
+# Run every 1 hour
+OnCalendar=*-*-* *:00:00
 
 # Catch up after downtime
 Persistent=true

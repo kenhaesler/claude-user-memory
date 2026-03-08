@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "description": "Autonomous Mode configuration for Agentic Substrate",
+  "version": "1.1.0",
+  "description": "Autonomous Mode - GitHub-driven development for vsphere-ai-dashboard",
 
   "mode": "safe",
   "_mode_options": ["safe", "unsafe"],
@@ -8,39 +8,41 @@
 
   "tasks": [
     {
-      "id": "self-improve",
-      "name": "Self-Improvement Cycle",
-      "description": "Review codebase, identify improvements, implement with tests",
-      "prompt": "Review the codebase for improvements. Focus on: code quality, test coverage, documentation gaps, and performance. Make only safe, minimal changes. Commit each improvement separately with clear messages.",
+      "id": "github-issues",
+      "name": "GitHub Issue Worker",
+      "description": "Fetch open issues from GitHub, pick one, implement it, create a PR",
+      "prompt": "You are an autonomous developer for the vsphere-ai-dashboard project.\n\n1. Run: gh issue list --repo $GITHUB_REPO --state open --limit 10 --json number,title,body,labels\n2. Pick the most actionable issue (prefer bugs over features, prefer issues labeled 'autonomous' or 'good-first-issue' if any exist).\n3. Read the issue details: gh issue view <number> --repo $GITHUB_REPO\n4. Analyze the codebase to understand the relevant code.\n5. Create a feature branch: git checkout -b autonomous/issue-<number>\n6. Implement the fix or feature with tests where applicable.\n7. Commit your changes with clear messages referencing the issue (e.g., 'fix #28: ...' or 'feat #30: ...').\n8. Push the branch: git push origin autonomous/issue-<number>\n9. Create a PR: gh pr create --repo $GITHUB_REPO --title '<type>: <summary> (closes #<number>)' --body '<description of changes>'\n10. If you cannot complete the issue, add a comment explaining what you found: gh issue comment <number> --repo $GITHUB_REPO --body '<analysis>'\n\nPriority order for issues:\n- Bugs (label: bug)\n- Small enhancements with clear scope\n- Documentation improvements\n- Skip issues that require architectural decisions or external service setup you cannot test.\n\nAlways read existing code before changing it. Make minimal, focused changes.",
       "enabled": true,
       "schedule": "default",
-      "max_turns": 20,
-      "max_budget_usd": 5.00
+      "max_turns": 200,
+      "max_budget_usd": 25.00
+    },
+    {
+      "id": "self-improve",
+      "name": "Codebase Self-Improvement",
+      "description": "Analyze codebase, fix issues, improve quality, create PRs",
+      "prompt": "You are an autonomous developer for the vsphere-ai-dashboard project.\n\nAnalyze the codebase for concrete improvements:\n1. Run any available linters or tests to find real issues.\n2. Check for: typos, dead code, missing error handling, security issues, broken imports.\n3. For each improvement found, create a branch, fix it, commit, push, and create a PR.\n4. Branch naming: autonomous/improve-<description>\n5. Keep each PR focused on one improvement.\n\nDo NOT:\n- Rewrite working code for style preferences\n- Make changes you cannot verify\n- Touch configuration or deployment files\n\nPush branches and create PRs for human review.",
+      "enabled": true,
+      "schedule": "default",
+      "max_turns": 30,
+      "max_budget_usd": 5.00,
+      "model_override": "claude-sonnet-4-6"
     },
     {
       "id": "run-tests",
       "name": "Test Suite Runner",
       "description": "Run test suite and fix any failures",
-      "prompt": "Run the full test suite. If any tests fail, investigate and fix the root cause. Do not skip or delete failing tests. Commit fixes with clear messages.",
-      "enabled": false,
+      "prompt": "Run the full test suite for the vsphere-ai-dashboard project. If any tests fail, investigate and fix the root cause. Do not skip or delete failing tests. Create a branch, commit fixes, push, and create a PR.",
+      "enabled": true,
       "schedule": "default",
       "max_turns": 15,
-      "max_budget_usd": 3.00
-    },
-    {
-      "id": "dependency-update",
-      "name": "Dependency Updater",
-      "description": "Check and update dependencies to latest compatible versions",
-      "prompt": "Check for outdated dependencies. Update them one at a time, running tests after each update. Revert any update that breaks tests. Commit successful updates individually.",
-      "enabled": false,
-      "schedule": "weekly",
-      "max_turns": 25,
-      "max_budget_usd": 8.00
+      "max_budget_usd": 3.00,
+      "model_override": "claude-sonnet-4-6"
     }
   ],
 
   "schedule": {
-    "default_interval": "4h",
+    "default_interval": "1h",
     "persistent": true,
     "randomized_delay_sec": 300,
     "_description": "Interval for systemd timer. Persistent catches up after downtime. Delay prevents API thundering herd."
@@ -54,16 +56,42 @@
       "Glob",
       "Grep",
       "Bash(git *)",
+      "Bash(gh issue *)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)",
+      "Bash(gh repo *)",
+      "Bash(gh label *)",
       "Bash(npm test*)",
       "Bash(npm run*)",
+      "Bash(npm install*)",
+      "Bash(npx *)",
+      "Bash(node *)",
       "Bash(python* -m pytest*)",
       "Bash(make *)",
       "Bash(cargo test*)",
-      "Bash(go test*)"
+      "Bash(go test*)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(wc *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(docker *)",
+      "Bash(docker-compose *)",
+      "Bash(dnf *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)",
+      "Bash(sudo dnf *)",
+      "Bash(sudo pip *)",
+      "Bash(sudo pip3 *)"
     ],
     "disallowed_tools": [
       "Bash(rm -rf *)",
-      "Bash(sudo *)",
+      "Bash(sudo rm *)",
+      "Bash(sudo chmod *)",
+      "Bash(sudo chown *)",
+      "Bash(sudo systemctl *)",
+      "Bash(sudo usermod *)",
       "Bash(curl * | bash*)",
       "Bash(wget * | bash*)",
       "Bash(chmod 777 *)",
@@ -72,36 +100,30 @@
       "Bash(mkfs*)",
       "Bash(dd *)"
     ],
-    "max_turns_global": 30,
-    "max_budget_usd_global": 10.00,
+    "max_turns_global": 200,
+    "max_budget_usd_global": 30.00,
     "circuit_breaker_max_failures": 3,
     "require_git_clean_before_run": true,
     "auto_commit": true,
     "auto_push": false,
-    "branch_strategy": "autonomous/run-{timestamp}",
-    "_branch_strategy_options": ["main", "autonomous/run-{timestamp}", "autonomous/latest"]
+    "branch_strategy": "main",
+    "_branch_strategy_options": ["main", "autonomous/run-{timestamp}", "autonomous/latest"],
+    "_branch_note": "Tasks create their own branches and PRs. Start from main each run."
   },
 
   "rate_limit": {
     "enabled": true,
     "max_session_percent": 80,
-    "_max_session_percent_description": "Use up to this % of the session limit before pausing (1-100)",
     "session_limit": 50,
-    "_session_limit_description": "Max sessions (tasks) allowed per window. Match your subscription plan's session limit.",
     "session_window_hours": 24,
-    "_session_window_description": "Length of one session window in hours. Session count resets after this period.",
     "pause_between_tasks_sec": 10,
-    "_pause_between_tasks_description": "Seconds to wait between consecutive tasks (prevents burst requests)",
     "wait_for_reset": true,
-    "_wait_for_reset_description": "If true, sleep until the session window resets. If false, exit and let systemd timer retry later.",
-    "tracking_file": "/var/log/claude-agent/usage-tracking.json",
-    "_tracking_file_description": "File to track session count across runs within a window"
+    "tracking_file": "/var/log/claude-agent/usage-tracking.json"
   },
 
   "model": {
     "primary": "claude-opus-4-6",
-    "fallback": "claude-sonnet-4-6",
-    "_description": "Opus 4.6 for best quality. Sonnet 4.6 as fallback if Opus is overloaded."
+    "fallback": "claude-sonnet-4-6"
   },
 
   "logging": {
@@ -113,18 +135,16 @@
   },
 
   "notifications": {
-    "enabled": false,
+    "enabled": true,
     "on_success": false,
     "on_failure": true,
     "on_circuit_breaker_open": true,
-    "method": "none",
-    "_method_options": ["none", "email", "webhook", "file"],
+    "method": "file",
     "webhook_url": "",
     "email_to": "",
     "notification_file": "/var/log/claude-agent/notifications.log"
   },
 
   "working_directory": "/home/claude-agent/workspace",
-  "system_prompt_file": "",
-  "_system_prompt_description": "Path to custom CLAUDE.md. If empty, uses CLAUDE-autonomous.md from install location."
+  "system_prompt_file": ""
 }

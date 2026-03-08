@@ -8,20 +8,21 @@ Wants=network-online.target
 Type=oneshot
 User=claude-agent
 Group=claude-agent
-WorkingDirectory=/home/claude-agent/workspace
+SupplementaryGroups=docker
+WorkingDirectory=/home/claude-agent/workspaces
 
 # Load API key from secure storage
 Environment=HOME=/home/claude-agent
+Environment=PATH=/home/claude-agent/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EnvironmentFile=-/home/claude-agent/.config/claude-agent/environment
 
-# Execute the task runner
-ExecStart=/home/claude-agent/.claude/autonomous/run-autonomous.sh
+# Execute the manager/employee orchestrator
+ExecStart=/home/claude-agent/.claude/autonomous/run-manager.sh
 
 # Security hardening
 NoNewPrivileges=yes
-ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/claude-agent/workspace /var/log/claude-agent /home/claude-agent/.claude
+ReadWritePaths=/home/claude-agent/workspace /home/claude-agent/workspaces /var/log/claude-agent /home/claude-agent/.claude /home/claude-agent/.config /home/claude-agent/.cache /home/claude-agent/.local
 PrivateTmp=yes
 ProtectKernelTunables=yes
 ProtectKernelModules=yes
@@ -35,7 +36,7 @@ RestrictRealtime=yes
 # Resource limits
 MemoryMax=2G
 CPUQuota=80%
-TimeoutStartSec=1800
+TimeoutStartSec=7200
 
 # Logging
 StandardOutput=journal
