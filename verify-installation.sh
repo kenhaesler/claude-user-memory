@@ -49,7 +49,7 @@ echo ""
 
 # Check skills
 echo "🧠 Checking skills..."
-SKILL_COUNT=$(find "$CLAUDE_DIR/skills" -name "skill.md" 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$(find "$CLAUDE_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$SKILL_COUNT" -eq 8 ]; then
     check_pass "All 8 skills installed"
     check_info "$(ls -d $CLAUDE_DIR/skills/*/ | xargs -n1 basename | sed 's/^/    - /')"

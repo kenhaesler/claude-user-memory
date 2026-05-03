@@ -53,7 +53,7 @@ else
 fi
 echo ""
 
-SKILL_COUNT=$(find "$HOME/.claude/skills" -name "skill.md" 2>/dev/null | wc -l | tr -d ' ')
+SKILL_COUNT=$(find "$HOME/.claude/skills" -name "SKILL.md" 2>/dev/null | wc -l | tr -d ' ')
 echo "  Skills: $SKILL_COUNT/5"
 if [ "$SKILL_COUNT" -eq 5 ]; then
     echo "    ✅ All skills present"

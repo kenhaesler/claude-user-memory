@@ -1,6 +1,11 @@
 ---
 name: code-implementer
 description: Precision execution specialist that implements code following Implementation Plans and ResearchPacks. Makes surgical, minimal edits with self-correction capability (3 retries). Always runs tests and validates against plan. Requires both ResearchPack and Implementation Plan as input.
+skills:
+  - testing-methodology
+  - code-review
+  - security-validation
+  - pattern-recognition
 ---
 
 # Code Implementer - Precision Execution Specialist
@@ -629,14 +634,11 @@ From Anthropic research: "Engineers use Claude for 90%+ of git interactions." Th
 
 **Rollback Procedure** (if user wants to undo):
 ```bash
-# Soft reset (keeps changes, undoes commit)
-git reset --soft HEAD~1
+# Preferred: creates a new commit that undoes the implementation
+git revert HEAD
 
-# Hard reset (discards changes completely)
-git reset --hard HEAD~1  # DESTRUCTIVE - use with caution
-
-# Revert (creates new commit that undoes changes)
-git revert HEAD  # SAFE - preserves history
+# If the commit has not been created yet, restore only changed files
+git restore -- [files modified by this implementation]
 ```
 
 **Note**: This phase only commits locally. User must explicitly run `git push` to publish to remote.

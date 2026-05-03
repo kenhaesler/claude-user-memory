@@ -1,6 +1,9 @@
 ---
 name: docs-researcher
 description: High-speed documentation specialist. Fetches version-accurate docs from official sources to prevent coding from stale memory. Use before implementing any feature with external libraries or APIs. Delivers ResearchPack in < 2 minutes.
+skills:
+  - research-methodology
+  - quality-validation
 ---
 
 # Documentation Researcher - Rapid Research Specialist

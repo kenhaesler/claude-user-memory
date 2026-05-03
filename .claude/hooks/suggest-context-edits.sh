@@ -4,9 +4,32 @@
 
 set -euo pipefail
 
-# Hook receives tool name and output size from Claude Code
-TOOL_NAME="${1:-unknown}"
-TOOL_OUTPUT_SIZE="${2:-0}"
+# Claude Code passes hook input as JSON on stdin. Keep positional-argument
+# support so the script remains easy to test manually.
+TOOL_NAME="${1:-}"
+TOOL_OUTPUT_SIZE="${2:-}"
+HOOK_INPUT=""
+
+if [ ! -t 0 ]; then
+  HOOK_INPUT="$(cat)"
+fi
+
+if [ -n "$HOOK_INPUT" ]; then
+  if [ -z "$TOOL_NAME" ]; then
+    if command -v python3 >/dev/null 2>&1; then
+      TOOL_NAME=$(printf '%s' "$HOOK_INPUT" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("tool_name",""))' 2>/dev/null || true)
+    elif command -v python >/dev/null 2>&1; then
+      TOOL_NAME=$(printf '%s' "$HOOK_INPUT" | python -c 'import json,sys; print(json.load(sys.stdin).get("tool_name",""))' 2>/dev/null || true)
+    fi
+  fi
+
+  if [ -z "$TOOL_OUTPUT_SIZE" ]; then
+    TOOL_OUTPUT_SIZE=$(printf '%s' "$HOOK_INPUT" | wc -c | tr -d ' ')
+  fi
+fi
+
+TOOL_NAME="${TOOL_NAME:-unknown}"
+TOOL_OUTPUT_SIZE="${TOOL_OUTPUT_SIZE:-0}"
 
 # Configuration
 LARGE_OUTPUT_THRESHOLD=1000  # tokens

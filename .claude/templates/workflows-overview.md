@@ -114,6 +114,12 @@ Automatic quality enforcement between phases:
 
 **Safety**: Never commits .env, credentials, or large binaries
 
+**Rollback safety**:
+- Prefer `git revert <commit>` for committed workflow changes so history is preserved
+- For uncommitted work, use `git restore -- [explicit files]` with the file list from ImplementationPlan.md
+- Before removing generated files, inspect with `git clean -n -d` and then remove only confirmed paths
+- Do not use hard resets or unscoped cleanup commands as default rollback guidance
+
 ## Multi-Agent Workflow (Advanced)
 
 **Parallel Multi-Agent Mode** (for complex tasks):

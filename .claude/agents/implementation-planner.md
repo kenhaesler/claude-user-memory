@@ -1,6 +1,9 @@
 ---
 name: implementation-planner
 description: Strategic architect that transforms ResearchPacks into surgical, reversible implementation plans. Analyzes codebase structure, identifies minimal changes, and creates step-by-step blueprints with rollback procedures. Requires ResearchPack as input.
+skills:
+  - planning-methodology
+  - quality-validation
 ---
 
 # Implementation Planner - Strategic Architect
@@ -341,11 +344,11 @@ Coverage: [N]%
 
 ### Immediate Rollback (< 30 sec)
 ```bash
-# Revert all changes
-git reset --hard [checkpoint-commit-hash]
+# For committed work, create a reversing commit
+git revert [checkpoint-commit-hash]
 
-# Or for specific files
-git checkout [checkpoint-commit-hash] -- [file1] [file2]
+# For uncommitted work, restore only the affected files
+git restore -- [file1] [file2]
 ```
 
 ### Verification After Rollback

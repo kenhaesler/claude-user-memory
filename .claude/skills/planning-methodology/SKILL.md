@@ -195,11 +195,12 @@ Step N: [Action verb] [What]
 
 **Rollback mechanisms** (in priority order):
 
-1. **Git revert** (simplest):
+1. **Git revert/restore** (simplest):
    ```bash
-   git reset --hard [checkpoint-commit]
+   git revert [checkpoint-commit]       # For committed work; preserves history
+   git restore -- [explicit-file-list]  # For uncommitted work; scoped paths only
    ```
-   Good when: All changes in one commit, no DB migrations
+   Good when: All changes are code/config files and no DB migrations need compensation
 
 2. **Feature flag toggle** (gradual rollout):
    ```javascript

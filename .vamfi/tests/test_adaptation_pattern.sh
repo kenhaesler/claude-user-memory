@@ -251,7 +251,7 @@ print_test "validate-pattern-index.sh exists and is executable"
 assert_file_executable "$VALIDATE_SCRIPT" "validate-pattern-index.sh exists and is executable"
 
 print_test "pattern-recognition skill exists"
-assert_file_exists "$HOME/.claude/skills/pattern-recognition/skill.md" "pattern-recognition skill exists"
+assert_file_exists "$HOME/.claude/skills/pattern-recognition/SKILL.md" "pattern-recognition skill exists"
 
 print_test "chief-architect agent exists"
 assert_file_exists "$HOME/.claude/agents/chief-architect.md" "chief-architect agent exists"

@@ -213,14 +213,16 @@ Chief-architect reports progress throughout:
 If you need to undo the entire workflow:
 
 ```bash
-# Use rollback procedure from ImplementationPlan.md
-git reset --hard HEAD~[N commits]
+# Preferred for committed workflow changes: create a reversing commit
+git revert <workflow-commit>
 
-# Or if not yet committed:
-git checkout -- [files modified]
+# If not yet committed, restore only files listed in ImplementationPlan.md
+git restore -- [files modified]
 
-# Or reset completely:
-git clean -fd
+# Before removing generated files, inspect the exact targets
+git clean -n -d
+# Then remove only explicitly confirmed generated paths
+git clean -f -d -- [generated files or directories]
 ```
 
 Each Implementation Plan includes specific rollback instructions.
