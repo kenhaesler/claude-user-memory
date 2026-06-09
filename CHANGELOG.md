@@ -5,6 +5,69 @@ All notable changes to Agentic Substrate will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2026-06-09
+
+### Changed (BREAKING)
+- **Repackaged as a Claude Code plugin** distributed via a marketplace in this
+  repository (`/plugin marketplace add kenhaesler/claude-user-memory`). The
+  entire custom installer suite (install.sh, install.ps1, update.sh,
+  uninstall.sh, customize.sh, manifest/checksum system, .mcpb desktop bundle)
+  is removed — the plugin system handles installation, versioning, and updates
+  natively.
+- **Quality gates now actually block.** Validation scripts are wired as
+  `UserPromptExpansion` hooks on `/plan` and `/implement` and fail with exit
+  code 2 (blocking, stderr fed back to Claude). Previously the hook
+  registration was never installed for users, and the scripts exited with
+  code 1, which Claude Code treats as a non-blocking error.
+- **Agents rewritten lean** (~5,400 → ~600 lines): behavior instructions only.
+  Removed marketing statistics, fake progress displays, second-precision time
+  budgets, "Opus 4.6" sections, and duplicated agent rosters. Thinking-keyword
+  tables replaced by the native `effort` frontmatter where warranted.
+- **Skills cleaned up**: undocumented frontmatter fields removed
+  (`auto_invoke`, `tags`); `code-review` renamed to `pre-commit-review` to
+  avoid colliding with the built-in code-review skill; pattern-recognition
+  simplified to knowledge-core.md capture.
+- **Commands rewritten** as proper prompt expansions using `$ARGUMENTS`
+  (previously a non-functional `{args}` placeholder); the custom `/context`
+  command is removed in favor of the built-in `/context`.
+- **Autonomous mode genericized**: personal project references replaced with
+  `$GITHUB_REPO`, stale dated model pins replaced with `opus`/`sonnet`
+  aliases, `sudo` package-manager entries removed from the safe-mode tool
+  allowlist. Moved from `.claude/autonomous/` to `autonomous/`.
+- DeepWiki MCP server now ships with the plugin (`.mcp.json`) instead of a
+  bespoke `mcp-config.json` schema that Claude Code never read.
+
+### Removed
+- Decorative enforcement machinery that could not work as designed:
+  `check-agent-economics.sh` (SubagentStart hooks are context-only and the
+  script read positional args that hooks never receive),
+  `suggest-context-edits.sh` (PostToolUse stdout is not shown to Claude; its
+  message counter never reset), `update-knowledge-core.sh` (Stop fires every
+  turn, not at session end, and wrote files into arbitrary projects),
+  `circuit-breaker.sh`/`api-matcher.sh`/`tracker.sh`/`calculate-confidence.sh`
+  and `pattern-index.json` (cross-project state in `~/.claude`; retry limits
+  are now behavioral rules in the agent prompts).
+- The four overview templates injected into every session via CLAUDE.md
+  imports (~4,400 words of self-description duplicating agent frontmatter).
+- Root-level process artifacts (~30 reports, social media posts, old release
+  notes) moved to `archive/history/`; legacy `R-and-D/`, examples, and
+  framework-integration notes moved under `archive/`.
+
+### Fixed
+- `grep -c ... || echo 0` constructs in validation scripts produced `"0\n0"`
+  on zero matches, breaking integer comparisons.
+- CHANGELOG had not been updated since 3.1.0 despite releases 4.0–4.2 (see
+  `archive/history/` for the 4.x release notes).
+
+---
+
+## [4.0.0 – 4.2.0] - 2025-11
+
+Tracked outside this changelog at the time; see `archive/history/RELEASE-NOTES-V4.md`
+and `archive/history/V4.1-RELEASE-NOTES.md`.
+
+---
+
 ## [3.1.0] - 2025-10-25
 
 ### Added

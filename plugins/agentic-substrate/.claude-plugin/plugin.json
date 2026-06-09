@@ -1,0 +1,13 @@
+{
+  "name": "agentic-substrate",
+  "displayName": "Agentic Substrate",
+  "version": "5.0.0",
+  "description": "Research → Plan → Implement workflow for Claude Code: 9 specialist agents, 8 auto-invoked skills, and enforced quality gates.",
+  "author": {
+    "name": "Ken Haesler",
+    "url": "https://github.com/kenhaesler"
+  },
+  "repository": "https://github.com/kenhaesler/claude-user-memory",
+  "license": "MIT",
+  "keywords": ["workflow", "research", "planning", "tdd", "quality-gates", "agents"]
+}
