@@ -1,142 +1,99 @@
-# Agentic Substrate v4.2
+# Agentic Substrate
 
-**Research-first development system for Claude Code CLI**
+**Research-first development workflow for Claude Code, packaged as a plugin.**
 
 > No API hallucinations. No coding from stale training data. Research → Plan → Implement.
 
 ---
 
-## Quick Start
+## Install
 
-```bash
-# Install
-git clone https://github.com/VAMFI/claude-user-memory.git
-cd claude-user-memory
-./install.sh
+In Claude Code:
 
-# Use
-/workflow Add Redis caching to ProductService
+```
+/plugin marketplace add kenhaesler/claude-user-memory
+/plugin install agentic-substrate@claude-user-memory
 ```
 
----
+That's it — no installer scripts, no files copied into `~/.claude/`, updates
+arrive when you run `/plugin marketplace update`.
 
 ## What You Get
 
-- **9 Agents** - Orchestration, research, planning, implementation, debugging, deployment
-- **8 Skills** - Auto-invoked capabilities for research, planning, validation, patterns, context, security, testing, code review
-- **5 Commands** - `/workflow`, `/research`, `/plan`, `/implement`, `/context`
-- **Quality Gates** - Research ≥80, Plans ≥85, Tests passing, 3-retry circuit breaker
-- **Memory** - Knowledge graph persists across sessions
+- **9 agents** — orchestration (chief-architect), core workflow
+  (docs-researcher, implementation-planner, brahma-analyzer,
+  code-implementer, brahma-investigator), and production specialists
+  (brahma-deployer, brahma-monitor, brahma-optimizer)
+- **8 skills** — auto-invoked methodologies for research, planning,
+  validation, testing, pre-commit review, security, pattern capture, and
+  context curation
+- **4 commands** — `/workflow`, `/research`, `/plan`, `/implement`
+- **Quality gates that actually block** — `UserPromptExpansion` hooks
+  validate the ResearchPack (≥ 80) before `/plan` and both artifacts before
+  `/implement`, using exit code 2 to stop the phase and feed the defect list
+  back to Claude
+- **DeepWiki MCP** — bundled so docs-researcher verifies real API signatures
+  against repository documentation
 
----
+See [plugins/agentic-substrate/README.md](plugins/agentic-substrate/README.md)
+for component details.
 
 ## Usage
 
 **Full automation:**
-```bash
-/workflow Add authentication with JWT tokens
+```
+/workflow Add Redis caching to ProductService with 5-minute TTL
 ```
 
 **Step-by-step:**
-```bash
-/research Redis for Node.js v5.0
+```
+/research Redis for Node.js
 /plan Redis caching implementation
 /implement
 ```
 
 **Direct agents:**
-```bash
-@chief-architect Build payment system
-@docs-researcher Research Stripe API
-@brahma-deployer Deploy v2.5.0
 ```
-
----
+Use the chief-architect agent to build a payment system
+Use docs-researcher to research the Stripe API
+```
 
 ## How It Works
 
-1. **Research** (< 2 min) - Fetch version-accurate docs before coding
-2. **Plan** (< 3 min) - Create minimal-change blueprint with rollback
-3. **Implement** (< 10 min) - Execute with TDD + self-correction
-4. **Learn** - Auto-capture patterns to knowledge graph
+1. **Research** — fetch version-accurate docs (DeepWiki + official sources) before coding
+2. **Plan** — minimal-change blueprint with verification steps and a rollback procedure
+3. **Implement** — TDD execution with bounded self-correction (3 attempts, then escalate)
+4. **Learn** — reusable patterns are captured to the project's `knowledge-core.md`
 
-Quality gates block bad inputs. Circuit breaker stops infinite loops.
+Quality gates block weak inputs between phases. Retries are bounded — agents
+stop and report instead of looping.
 
----
+## Autonomous Mode (optional, separate)
 
-## Installation
+[`autonomous/`](autonomous/README.md) contains a systemd-based runner for
+headless `claude -p` operation on a VM (GitHub issue worker, self-improvement,
+test fixing) with tool allowlists, session-based rate limiting, and a circuit
+breaker. It is independent of the plugin — see its README for setup.
 
-**Cross-Platform:** Works on macOS, Linux, Windows (WSL), and most Unix systems
+## Repository Layout
 
-**Requirements:** Minimal - bash and git only. Optional: python3/python for enhanced features
-
-**Installs to:** `~/.claude/`
-
-**Preserves:**
-- All data in `~/.claude/data/`
-- Your `CLAUDE.md` customizations (smart-merged)
-- Modified files (detected by checksum)
-- Knowledge files and patterns
-
-**Upgrade:**
-```bash
-./install.sh
 ```
-Your data and customizations are automatically preserved.
-
-**Update:**
-```bash
-./update.sh    # Selective update (only changed files)
+.claude-plugin/marketplace.json    # marketplace manifest
+plugins/agentic-substrate/         # the plugin (agents, skills, commands, hooks, scripts)
+autonomous/                        # headless VM runner (optional)
+archive/                           # historical docs, reports, and legacy R&D
 ```
 
----
+## Philosophy
 
-## Configuration
-
-```bash
-./customize.sh                              # Interactive menu
-./customize.sh --enable-mcp memory         # Enable MCP servers
-./customize.sh --list-mcps                 # View configuration
-```
-
----
-
-## Uninstall
-
-```bash
-./uninstall.sh --dry-run    # Preview what will be removed
-./uninstall.sh              # Remove (preserves data)
-```
-
----
-
-## Documentation
-
-- [Agents Overview](.claude/templates/agents-overview.md) - All 9 agents
-- [Skills Overview](.claude/templates/skills-overview.md) - Auto-invoked capabilities
-- [Workflows Overview](.claude/templates/workflows-overview.md) - Development patterns
-- [Installation Behavior](INSTALLATION-BEHAVIOR.md) - Data preservation details
-- [Release Notes](RELEASE-NOTES-V4.md) - v4.0/4.1 features
-
----
-
-## Research Foundation
-
-Built on Anthropic research (2024-2025):
-- Extended Thinking: 54% improvement on complex tasks
-- Multi-Agent Orchestration: 90.2% performance improvement
-- Contextual Retrieval: 49-67% better accuracy
-
----
+See [PHILOSOPHY.md](PHILOSOPHY.md). The short version: ground every
+implementation in current documentation, make the smallest reversible change,
+verify everything, and preserve what you learn.
 
 ## License
 
-MIT License - See [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE)
 
 ---
 
-**Version:** 4.2.0
-**Released:** November 22, 2025
-**Status:** Production-Ready
-
-*Research → Plan → Implement → Learn*
+**Version:** 5.0.0 · *Research → Plan → Implement → Learn*
