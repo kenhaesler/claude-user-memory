@@ -2,16 +2,12 @@
 .DS_Store
 *.DS_Store
 
-# User-specific files (should not be in repo)
-.claude/settings.local.json
-.claude/.circuit-breaker-state
-
 # IDE files
 .vscode/
 .idea/
 
-# Backup directories created during testing
-.claude.backup-*/
+# Local Claude Code settings
+.claude/settings.local.json
 
 # Test artifacts
 test-results/

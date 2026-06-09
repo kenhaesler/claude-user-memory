@@ -1,0 +1,17 @@
+{
+  "name": "claude-user-memory",
+  "owner": {
+    "name": "Ken Haesler",
+    "url": "https://github.com/kenhaesler"
+  },
+  "plugins": [
+    {
+      "name": "agentic-substrate",
+      "source": "./plugins/agentic-substrate",
+      "description": "Research → Plan → Implement workflow for Claude Code: 9 specialist agents, 8 auto-invoked skills, and enforced quality gates.",
+      "author": {
+        "name": "Ken Haesler"
+      }
+    }
+  ]
+}
