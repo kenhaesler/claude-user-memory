@@ -194,7 +194,7 @@ log_info "Step 6: Installing autonomous mode files..."
 AUTONOMOUS_DIR="$AGENT_HOME/.claude/autonomous"
 mkdir -p "$AUTONOMOUS_DIR"
 
-for f in run-autonomous.sh autonomous-config.json CLAUDE-autonomous.md; do
+for f in run-autonomous.sh circuit-breaker.sh autonomous-config.json CLAUDE-autonomous.md; do
     if [ -f "$SCRIPT_DIR/$f" ]; then
         cp "$SCRIPT_DIR/$f" "$AUTONOMOUS_DIR/"
         log_info "  Installed: $f"

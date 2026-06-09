@@ -11,7 +11,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="${AUTONOMOUS_CONFIG:-$SCRIPT_DIR/autonomous-config.json}"
-CIRCUIT_BREAKER="${SCRIPT_DIR}/../validators/circuit-breaker.sh"
+CIRCUIT_BREAKER="${SCRIPT_DIR}/circuit-breaker.sh"
 LOG_DIR=""
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
 TASK_ID=""
@@ -367,8 +367,8 @@ run_task() {
 
     # Get model
     local model fallback_model
-    model=$(json_get "$CONFIG_FILE" "model.primary" 2>/dev/null || echo "claude-opus-4-6")
-    fallback_model=$(json_get "$CONFIG_FILE" "model.fallback" 2>/dev/null || echo "claude-sonnet-4-6")
+    model=$(json_get "$CONFIG_FILE" "model.primary" 2>/dev/null || echo "opus")
+    fallback_model=$(json_get "$CONFIG_FILE" "model.fallback" 2>/dev/null || echo "sonnet")
 
     # Get working directory
     local workdir

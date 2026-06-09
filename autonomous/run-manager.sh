@@ -332,13 +332,13 @@ run_employee() {
     log_info "=========================================="
 
     local model max_turns max_budget
-    model=$(json_get "$CONFIG_FILE" "models.employee" 2>/dev/null || echo "claude-opus-4-6")
+    model=$(json_get "$CONFIG_FILE" "models.employee" 2>/dev/null || echo "opus")
     max_turns=$(json_get "$CONFIG_FILE" "limits.max_employee_turns" 2>/dev/null || echo "200")
     max_budget=$(json_get "$CONFIG_FILE" "limits.max_employee_budget_usd" 2>/dev/null || echo "25.00")
 
     # Analyze mode uses Sonnet (cheaper — no code changes, just analysis)
     if [ "$mode" = "analyze" ]; then
-        model="claude-sonnet-4-6"
+        model="sonnet"
         max_turns=50
         max_budget="5.00"
     fi
@@ -385,7 +385,7 @@ Remember: commit locally but NEVER push. The manager will review and push if app
     # Build employee command
     local -a cmd=(claude -p --verbose --output-format stream-json --no-session-persistence)
     cmd+=(--model "$model")
-    cmd+=(--fallback-model "claude-sonnet-4-6")
+    cmd+=(--fallback-model "sonnet")
     cmd+=(--max-turns "$max_turns")
     cmd+=(--max-budget-usd "$max_budget")
     cmd+=(--system-prompt-file "$system_prompt")
@@ -545,7 +545,7 @@ run_manager_review() {
     log_info "==========================================" >&2
 
     local model max_turns max_budget
-    model=$(json_get "$CONFIG_FILE" "models.manager" 2>/dev/null || echo "claude-sonnet-4-6")
+    model=$(json_get "$CONFIG_FILE" "models.manager" 2>/dev/null || echo "sonnet")
     max_turns=$(json_get "$CONFIG_FILE" "limits.max_manager_turns" 2>/dev/null || echo "30")
     max_budget=$(json_get "$CONFIG_FILE" "limits.max_manager_budget_usd" 2>/dev/null || echo "3.00")
 

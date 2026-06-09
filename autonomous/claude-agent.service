@@ -1,6 +1,6 @@
 [Unit]
 Description=Claude Code Autonomous Agent
-Documentation=https://github.com/VAMFI/claude-user-memory
+Documentation=https://github.com/kenhaesler/claude-user-memory
 After=network-online.target
 Wants=network-online.target
 

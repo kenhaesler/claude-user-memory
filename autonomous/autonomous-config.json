@@ -1,6 +1,6 @@
 {
   "version": "1.1.0",
-  "description": "Autonomous Mode - GitHub-driven development for vsphere-ai-dashboard",
+  "description": "Autonomous Mode - GitHub-driven development (target repo comes from the GITHUB_REPO environment variable)",
 
   "mode": "safe",
   "_mode_options": ["safe", "unsafe"],
@@ -11,7 +11,7 @@
       "id": "github-issues",
       "name": "GitHub Issue Worker",
       "description": "Fetch open issues from GitHub, pick one, implement it, create a PR",
-      "prompt": "You are an autonomous developer for the vsphere-ai-dashboard project.\n\n1. Run: gh issue list --repo $GITHUB_REPO --state open --limit 10 --json number,title,body,labels\n2. Pick the most actionable issue (prefer bugs over features, prefer issues labeled 'autonomous' or 'good-first-issue' if any exist).\n3. Read the issue details: gh issue view <number> --repo $GITHUB_REPO\n4. Analyze the codebase to understand the relevant code.\n5. Create a feature branch: git checkout -b autonomous/issue-<number>\n6. Implement the fix or feature with tests where applicable.\n7. Commit your changes with clear messages referencing the issue (e.g., 'fix #28: ...' or 'feat #30: ...').\n8. Push the branch: git push origin autonomous/issue-<number>\n9. Create a PR: gh pr create --repo $GITHUB_REPO --title '<type>: <summary> (closes #<number>)' --body '<description of changes>'\n10. If you cannot complete the issue, add a comment explaining what you found: gh issue comment <number> --repo $GITHUB_REPO --body '<analysis>'\n\nPriority order for issues:\n- Bugs (label: bug)\n- Small enhancements with clear scope\n- Documentation improvements\n- Skip issues that require architectural decisions or external service setup you cannot test.\n\nAlways read existing code before changing it. Make minimal, focused changes.",
+      "prompt": "You are an autonomous developer for the $GITHUB_REPO project.\n\n1. Run: gh issue list --repo $GITHUB_REPO --state open --limit 10 --json number,title,body,labels\n2. Pick the most actionable issue (prefer bugs over features, prefer issues labeled 'autonomous' or 'good-first-issue' if any exist).\n3. Read the issue details: gh issue view <number> --repo $GITHUB_REPO\n4. Analyze the codebase to understand the relevant code.\n5. Create a feature branch: git checkout -b autonomous/issue-<number>\n6. Implement the fix or feature with tests where applicable.\n7. Commit your changes with clear messages referencing the issue (e.g., 'fix #28: ...' or 'feat #30: ...').\n8. Push the branch: git push origin autonomous/issue-<number>\n9. Create a PR: gh pr create --repo $GITHUB_REPO --title '<type>: <summary> (closes #<number>)' --body '<description of changes>'\n10. If you cannot complete the issue, add a comment explaining what you found: gh issue comment <number> --repo $GITHUB_REPO --body '<analysis>'\n\nPriority order for issues:\n- Bugs (label: bug)\n- Small enhancements with clear scope\n- Documentation improvements\n- Skip issues that require architectural decisions or external service setup you cannot test.\n\nAlways read existing code before changing it. Make minimal, focused changes.",
       "enabled": true,
       "schedule": "default",
       "max_turns": 200,
@@ -21,23 +21,23 @@
       "id": "self-improve",
       "name": "Codebase Self-Improvement",
       "description": "Analyze codebase, fix issues, improve quality, create PRs",
-      "prompt": "You are an autonomous developer for the vsphere-ai-dashboard project.\n\nAnalyze the codebase for concrete improvements:\n1. Run any available linters or tests to find real issues.\n2. Check for: typos, dead code, missing error handling, security issues, broken imports.\n3. For each improvement found, create a branch, fix it, commit, push, and create a PR.\n4. Branch naming: autonomous/improve-<description>\n5. Keep each PR focused on one improvement.\n\nDo NOT:\n- Rewrite working code for style preferences\n- Make changes you cannot verify\n- Touch configuration or deployment files\n\nPush branches and create PRs for human review.",
+      "prompt": "You are an autonomous developer for the $GITHUB_REPO project.\n\nAnalyze the codebase for concrete improvements:\n1. Run any available linters or tests to find real issues.\n2. Check for: typos, dead code, missing error handling, security issues, broken imports.\n3. For each improvement found, create a branch, fix it, commit, push, and create a PR.\n4. Branch naming: autonomous/improve-<description>\n5. Keep each PR focused on one improvement.\n\nDo NOT:\n- Rewrite working code for style preferences\n- Make changes you cannot verify\n- Touch configuration or deployment files\n\nPush branches and create PRs for human review.",
       "enabled": true,
       "schedule": "default",
       "max_turns": 30,
       "max_budget_usd": 5.00,
-      "model_override": "claude-sonnet-4-6"
+      "model_override": "sonnet"
     },
     {
       "id": "run-tests",
       "name": "Test Suite Runner",
       "description": "Run test suite and fix any failures",
-      "prompt": "Run the full test suite for the vsphere-ai-dashboard project. If any tests fail, investigate and fix the root cause. Do not skip or delete failing tests. Create a branch, commit fixes, push, and create a PR.",
+      "prompt": "Run the full test suite for the $GITHUB_REPO project. If any tests fail, investigate and fix the root cause. Do not skip or delete failing tests. Create a branch, commit fixes, push, and create a PR.",
       "enabled": true,
       "schedule": "default",
       "max_turns": 15,
       "max_budget_usd": 3.00,
-      "model_override": "claude-sonnet-4-6"
+      "model_override": "sonnet"
     }
   ],
 
@@ -80,10 +80,7 @@
       "Bash(docker-compose *)",
       "Bash(dnf *)",
       "Bash(pip *)",
-      "Bash(pip3 *)",
-      "Bash(sudo dnf *)",
-      "Bash(sudo pip *)",
-      "Bash(sudo pip3 *)"
+      "Bash(pip3 *)"
     ],
     "disallowed_tools": [
       "Bash(rm -rf *)",
@@ -122,8 +119,9 @@
   },
 
   "model": {
-    "primary": "claude-opus-4-6",
-    "fallback": "claude-sonnet-4-6"
+    "primary": "opus",
+    "fallback": "sonnet",
+    "_note": "Aliases track the latest Opus/Sonnet automatically; pin a full model ID only if you need reproducibility."
   },
 
   "logging": {

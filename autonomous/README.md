@@ -22,7 +22,7 @@ The easiest way to get started:
 
 ```bash
 # From a fresh Rocky Linux 9 VM (as root):
-sudo bash .claude/autonomous/install-rocky.sh
+sudo bash autonomous/install-rocky.sh
 ```
 
 This interactive installer handles everything:
@@ -159,7 +159,7 @@ See `autonomous-config.json` for all options with inline documentation (`_descri
 | `safety.auto_commit` | `true` | Auto-commit changes after each task |
 | `safety.auto_push` | `false` | Auto-push commits (disabled by default) |
 | `safety.branch_strategy` | `autonomous/run-{timestamp}` | Git branch for changes |
-| `model.primary` | `claude-opus-4-6` | Model for autonomous runs |
+| `model.primary` | `opus` | Model for autonomous runs |
 | `schedule.default_interval` | `4h` | Run frequency |
 | `rate_limit.enabled` | `true` | Enable session count tracking |
 | `rate_limit.max_session_percent` | `80` | Use up to this % of session limit |
@@ -188,10 +188,10 @@ sudo -u claude-agent /home/claude-agent/.claude/autonomous/run-autonomous.sh --l
 ### Circuit breaker open
 ```bash
 # Check status
-bash ~/.claude/validators/circuit-breaker.sh autonomous status
+bash ~/.claude/autonomous/circuit-breaker.sh autonomous status
 
 # Reset after investigating
-bash ~/.claude/validators/circuit-breaker.sh autonomous reset
+bash ~/.claude/autonomous/circuit-breaker.sh autonomous reset
 ```
 
 ### Service not starting

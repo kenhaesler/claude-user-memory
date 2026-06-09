@@ -1,7 +1,7 @@
 {
   "projects": [
     {
-      "repo": "kenhaesler/vsphere-ai-dashboard",
+      "repo": "your-org/your-repo",
       "priority": "high",
       "mode": "full"
     }
@@ -15,8 +15,8 @@
   "schedule": "1h",
 
   "models": {
-    "employee": "claude-opus-4-6",
-    "manager": "claude-sonnet-4-6"
+    "employee": "opus",
+    "manager": "sonnet"
   },
 
   "limits": {

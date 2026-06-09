@@ -3,13 +3,13 @@
 # Part of Agentic Substrate v4.2
 #
 # Usage (as root):
-#   curl -fsSL https://raw.githubusercontent.com/VAMFI/claude-user-memory/main/.claude/autonomous/install-rocky.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/kenhaesler/claude-user-memory/main/autonomous/install-rocky.sh | sudo bash
 #
 # Or locally:
 #   sudo ./install-rocky.sh
 #
 # What this does:
-#   1. Installs the Agentic Substrate (with autonomous mode)
+#   1. Installs the autonomous mode files to ~/.claude/autonomous
 #   2. Runs setup-vm.sh to provision the Rocky Linux 9 VM
 #   3. Guides you through API key setup
 #   4. Offers to enable the systemd timer
@@ -92,16 +92,20 @@ done
 # STEP 2: INSTALL AGENTIC SUBSTRATE
 # ============================================================================
 
-header "Step 2/5: Installing Agentic Substrate with autonomous mode..."
+header "Step 2/5: Installing autonomous mode files..."
 
 INSTALL_DIR="/tmp/agentic-substrate-install-$$"
 
-if [ -f "./install.sh" ] && [ -f "./manifest-template.json" ]; then
+if [ -d "./autonomous" ] && [ -f "./autonomous/run-autonomous.sh" ]; then
     info "Using local repository"
     INSTALL_DIR="$(pwd)"
+elif [ -f "./run-autonomous.sh" ]; then
+    # Script run from inside the autonomous/ directory itself
+    info "Using local repository"
+    INSTALL_DIR="$(cd .. && pwd)"
 else
     info "Cloning repository..."
-    git clone --depth 1 https://github.com/VAMFI/claude-user-memory.git "$INSTALL_DIR" 2>/dev/null || {
+    git clone --depth 1 https://github.com/kenhaesler/claude-user-memory.git "$INSTALL_DIR" 2>/dev/null || {
         fail "Failed to clone repository"
         exit 1
     }
@@ -115,20 +119,13 @@ TARGET_HOME=$(eval echo "~$TARGET_USER")
 
 info "Installing for user: $TARGET_USER ($TARGET_HOME)"
 
-# Run the installer with autonomous mode
-if [ "$TARGET_USER" != "root" ]; then
-    su - "$TARGET_USER" -c "cd '$INSTALL_DIR' && bash install.sh --with-autonomous --force" || {
-        fail "Substrate installation failed"
-        exit 1
-    }
-else
-    bash install.sh --with-autonomous --force || {
-        fail "Substrate installation failed"
-        exit 1
-    }
-fi
+# Copy the autonomous mode files into the target user's ~/.claude
+AUTONOMOUS_DEST="$TARGET_HOME/.claude/autonomous"
+mkdir -p "$AUTONOMOUS_DEST"
+cp -r "$INSTALL_DIR/autonomous/." "$AUTONOMOUS_DEST/"
+chown -R "$TARGET_USER" "$TARGET_HOME/.claude" 2>/dev/null || true
 
-ok "Agentic Substrate installed with autonomous mode"
+ok "Autonomous mode files installed"
 
 # ============================================================================
 # STEP 3: RUN VM SETUP
@@ -180,7 +177,7 @@ if [ -f "$AGENT_CONFIG" ]; then
     echo ""
     echo "  Default settings:"
     echo "    Mode:     safe (--allowedTools whitelist)"
-    echo "    Model:    claude-opus-4-6 (best quality, Sonnet fallback)"
+    echo "    Model:    opus (best quality, Sonnet fallback)"
     echo "    Schedule: every 4 hours"
     echo "    Sessions: Up to 80% of session limit (50 sessions/24h default)"
     echo "    Tasks:    self-improve (enabled), run-tests (disabled), dependency-update (disabled)"
